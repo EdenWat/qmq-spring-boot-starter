@@ -29,5 +29,4 @@ public class ExampleAutoConfigure {
 	ExampleService exampleService() {
 		return new ExampleService(properties.getPrefix(), properties.getSuffix());
 	}
-
 }
