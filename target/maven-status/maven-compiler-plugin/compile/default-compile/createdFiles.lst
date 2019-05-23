@@ -1,0 +1,4 @@
+com\kyexpress\qmq\ExampleAutoConfigure.class
+com\kyexpress\qmq\ExampleServiceProperties.class
+com\kyexpress\qmq\ExampleService.class
+META-INF\spring-configuration-metadata.json

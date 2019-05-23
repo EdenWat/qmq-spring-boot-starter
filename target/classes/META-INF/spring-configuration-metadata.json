@@ -1,0 +1,22 @@
+{
+  "groups": [
+    {
+      "name": "example.service",
+      "type": "com.kyexpress.qmq.ExampleServiceProperties",
+      "sourceType": "com.kyexpress.qmq.ExampleServiceProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "example.service.prefix",
+      "type": "java.lang.String",
+      "sourceType": "com.kyexpress.qmq.ExampleServiceProperties"
+    },
+    {
+      "name": "example.service.suffix",
+      "type": "java.lang.String",
+      "sourceType": "com.kyexpress.qmq.ExampleServiceProperties"
+    }
+  ],
+  "hints": []
+}
