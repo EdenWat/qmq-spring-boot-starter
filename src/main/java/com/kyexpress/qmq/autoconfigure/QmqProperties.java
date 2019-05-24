@@ -26,22 +26,22 @@ public class QmqProperties {
 	private String metaServer = QmqConstant.DEFAULT_META_SERVER;
 
 	/**
-	 * 异步发送队列大小
+	 * 异步发送队列大小，默认 10000
 	 */
 	private int maxQueueSize = QmqConstant.DEFAULT_MAX_QUEUE_SIZE;
 
 	/**
-	 * 发送线程数，默认是3
+	 * 发送线程数，默认 3
 	 */
 	private int sendThreads = QmqConstant.DEFAULT_SEND_THREADS;
 
 	/**
-	 * 默认每次发送时最大批量大小，默认30
+	 * 默认每次发送时最大批量大小，默认 30
 	 */
 	private int sendBatch = QmqConstant.DEFAULT_SEND_BATCH;
 
 	/**
-	 * 如果消息发送失败，重试次数，默认10
+	 * 如果消息发送失败，重试次数，默认 10
 	 */
 	private int sendTryCount = QmqConstant.DEFAULT_SEND_TRY_COUNT;
 
