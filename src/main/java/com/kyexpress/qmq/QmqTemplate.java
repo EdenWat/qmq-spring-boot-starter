@@ -2,6 +2,7 @@ package com.kyexpress.qmq;
 
 import com.google.gson.Gson;
 import com.kyexpress.qmq.autoconfigure.QmqProperties;
+import com.kyexpress.qmq.constant.TimeUnitEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
@@ -42,11 +43,21 @@ public class QmqTemplate {
 	 * 发送延迟消息到默认主题
 	 * @param content 消息内容
 	 * @param duration 延迟时间间隔
-	 * @param timeUnit {@link TimeUnit} 延时时间单位
+	 * @param timeUnit 延时时间单位
 	 * @see com.kyexpress.qmq.constant.QmqConstant#DEFAULT_SUBJECT
 	 */
 	public void sendDelay(Map<String, Object> content, long duration, TimeUnit timeUnit) {
 		sendDelay(properties.getDefaultSubject(), content, duration, timeUnit);
+	}
+
+	/**
+	 * 发送延迟消息到指定主题
+	 * @param subject 消息主题
+	 * @param content 消息内容
+	 * @param timeUnitEnum 延迟时间
+	 */
+	public void sendDelay(String subject, Map<String, Object> content, TimeUnitEnum timeUnitEnum) {
+		sendDelay(subject, content, timeUnitEnum.getDuration(), timeUnitEnum.getTimeUnit());
 	}
 
 	/**
