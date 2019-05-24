@@ -1,6 +1,5 @@
 package com.kyexpress.qmq;
 
-import com.google.gson.Gson;
 import com.kyexpress.qmq.autoconfigure.QmqProperties;
 import com.kyexpress.qmq.constant.TimeUnitEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -223,13 +222,13 @@ public class QmqTemplate {
 			@Override
 			public void onSuccess(Message message) {
 				// send success
-				log.info("QMQ 发送异步消息成功，消息主题：{}，消息内容：{}", message.getSubject(), new Gson().toJson(message));
+				log.info("QMQ 发送异步消息成功，消息主题：{}，消息内容：{}", message.getSubject(), message.getAttrs());
 			}
 
 			@Override
 			public void onFailed(Message message) {
 				// send failed
-				log.error("QMQ 发送异步消息失败，消息主题：{}，消息内容：{}", message.getSubject(), new Gson().toJson(message));
+				log.error("QMQ 发送异步消息失败，消息主题：{}，消息内容：{}", message.getSubject(), message.getAttrs());
 			}
 		});
 	}
