@@ -11,9 +11,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("spring.qmq")
 public class QmqProperties {
 	/**
-	 * 是否开启 QMQ，默认值 false
+	 * 是否开启 QMQ，默认值 true
 	 */
-	private boolean enabled = false;
+	private boolean enabled = true;
 
 	/**
 	 * QMQ AppCode，默认值 qmq_default_code
