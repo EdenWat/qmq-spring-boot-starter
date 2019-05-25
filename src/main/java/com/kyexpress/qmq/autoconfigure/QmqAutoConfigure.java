@@ -45,7 +45,7 @@ public class QmqAutoConfigure {
 		producer.setSendTryCount(properties.getProducer().getSendTryCount());
 
 		if (log.isDebugEnabled()) {
-			log.debug("init qmq MessageProducer success");
+			log.debug("Init QMQ MessageProducer Success");
 		}
 
 		return producer;
@@ -62,7 +62,7 @@ public class QmqAutoConfigure {
 	@ConditionalOnBean(MessageProducer.class)
 	public QmqTemplate template(MessageProducer producer, QmqProperties properties) {
 		if (log.isDebugEnabled()) {
-			log.debug("init qmq QmqTemplate success");
+			log.debug("Init QMQ QmqTemplate Success");
 		}
 
 		return new QmqTemplate(producer, properties);
