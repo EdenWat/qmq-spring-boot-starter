@@ -50,6 +50,12 @@ public class QmqUtil {
 	 * @return Map
 	 */
 	public static Map<String, Object> objToMap(Object object) {
+		// 参数校验
+		if (object == null) {
+			return null;
+		}
+
+		// TODO 需要支持嵌套 Object 转换到同一个 Map
 		Map<String, Object> describe = null;
 
 		try {

@@ -1,5 +1,6 @@
 package com.kyexpress.qmq;
 
+import com.google.gson.Gson;
 import com.kyexpress.qmq.autoconfigure.QmqProperties;
 import com.kyexpress.qmq.constant.TimeUnitEnum;
 import com.kyexpress.qmq.util.QmqUtil;
@@ -41,7 +42,16 @@ public class QmqTemplate {
 	}
 
 	/**
-	 * 发送延迟消息到默认主题
+	 * 发送延迟消息到默认主题，消息内容使用 Map
+	 * @param content 消息内容
+	 * @param timeUnitEnum 延迟时间枚举
+	 */
+	public void sendDelayDefault(Map<String, Object> content, TimeUnitEnum timeUnitEnum) {
+		sendDelay(properties.getTemplate().getDefaultSubject(), content, timeUnitEnum);
+	}
+
+	/**
+	 * 发送延迟消息到默认主题，消息内容使用 Map
 	 * @param content 消息内容
 	 * @param duration 延迟时间间隔
 	 * @param timeUnit 延时时间单位
@@ -52,7 +62,7 @@ public class QmqTemplate {
 	}
 
 	/**
-	 * 发送定时消息到默认主题
+	 * 发送定时消息到默认主题，消息内容使用 Map
 	 * @param content 消息内容
 	 * @param date {@link Date} 消息发送日期，用于延迟或定时发送
 	 * @see com.kyexpress.qmq.constant.QmqConstant#DEFAULT_SUBJECT
@@ -62,7 +72,7 @@ public class QmqTemplate {
 	}
 
 	/**
-	 * 发送即时消息到默认主题
+	 * 发送即时消息到默认主题，消息内容使用 Map
 	 * @param content 消息内容
 	 * @see com.kyexpress.qmq.constant.QmqConstant#DEFAULT_SUBJECT
 	 */
@@ -71,37 +81,78 @@ public class QmqTemplate {
 	}
 
 	/**
-	 * 发送延迟消息到指定主题
+	 * 发送延迟消息到指定主题，消息内容使用 Object
 	 * @param subject 消息主题
 	 * @param content 消息内容
-	 * @param timeUnitEnum 延迟时间
+	 * @param timeUnitEnum 延迟时间枚举
+	 */
+	public void sendDelay(String subject, Object content, TimeUnitEnum timeUnitEnum) {
+		sendDelay(subject, content, timeUnitEnum.getDuration(), timeUnitEnum.getTimeUnit());
+	}
+
+	/**
+	 * 发送延迟消息到指定主题，消息内容使用 Map
+	 * @param subject 消息主题
+	 * @param content 消息内容
+	 * @param timeUnitEnum 延迟时间枚举
 	 */
 	public void sendDelay(String subject, Map<String, Object> content, TimeUnitEnum timeUnitEnum) {
 		sendDelay(subject, content, timeUnitEnum.getDuration(), timeUnitEnum.getTimeUnit());
 	}
 
 	/**
-	 * 发送延迟消息到指定主题
+	 * 发送延迟消息到指定主题，消息内容使用 Object
 	 * @param subject 消息主题
 	 * @param content 消息内容
 	 * @param duration 延迟时间间隔
-	 * @param timeUnit {@link TimeUnit} 延时时间单位
+	 * @param timeUnit 延时时间单位
+	 */
+	public void sendDelay(String subject, Object content, long duration, TimeUnit timeUnit) {
+		// 判断消息延迟发送时间
+		Assert.isTrue(duration > 0, "消息延迟接收时间不能为过去时");
+		Assert.notNull(timeUnit, "消息延迟接收时间单位不能为空");
+
+		// 讲延迟时间转换为毫秒
+		long sendTime = System.currentTimeMillis() + timeUnit.toMillis(duration);
+		send(subject, content, new Date(sendTime));
+	}
+
+	/**
+	 * 发送延迟消息到指定主题，消息内容使用 Map
+	 * @param subject 消息主题
+	 * @param content 消息内容
+	 * @param duration 延迟时间间隔
+	 * @param timeUnit 延时时间单位
 	 */
 	public void sendDelay(String subject, Map<String, Object> content, long duration, TimeUnit timeUnit) {
 		// 判断消息延迟发送时间
 		Assert.isTrue(duration > 0, "消息延迟接收时间不能为过去时");
 		Assert.notNull(timeUnit, "消息延迟接收时间单位不能为空");
+
 		// 讲延迟时间转换为毫秒
 		long sendTime = System.currentTimeMillis() + timeUnit.toMillis(duration);
-
 		send(subject, content, new Date(sendTime));
 	}
 
 	/**
-	 * 发送定时消息到指定主题
+	 * 发送定时消息到指定主题，消息内容使用 Object
 	 * @param subject 消息主题
 	 * @param content 消息内容
-	 * @param date {@link Date} 消息发送日期，用于延迟或定时发送
+	 * @param date 消息发送日期，用于延迟或定时发送
+	 */
+	public void sendDelay(String subject, Object content, Date date) {
+		// 判断消息定时发送时间
+		Assert.notNull(date, "消息定时接收时间不能为空");
+		Assert.isTrue(date.getTime() > System.currentTimeMillis(), "消息定时接收时间不能为过去时");
+
+		send(subject, content, date);
+	}
+
+	/**
+	 * 发送定时消息到指定主题，消息内容使用 Map
+	 * @param subject 消息主题
+	 * @param content 消息内容
+	 * @param date 消息发送日期，用于延迟或定时发送
 	 */
 	public void sendDelay(String subject, Map<String, Object> content, Date date) {
 		// 判断消息定时发送时间
@@ -112,7 +163,16 @@ public class QmqTemplate {
 	}
 
 	/**
-	 * 发送即时消息到指定主题
+	 * 发送即时消息到指定主题，消息内容使用 Object
+	 * @param subject 消息主题
+	 * @param content 消息内容
+	 */
+	public void send(String subject, Object content) {
+		send(subject, content, null);
+	}
+
+	/**
+	 * 发送即时消息到指定主题，消息内容使用 Map
 	 * @param subject 消息主题
 	 * @param content 消息内容
 	 */
@@ -127,8 +187,6 @@ public class QmqTemplate {
 	 * @param date 消息发送日期，用于延迟或定时发送
 	 */
 	private void send(String subject, Object content, Date date) {
-		// 消息对象不能为空
-		Assert.notNull(content, "QMQ 消息发送对象 Content 不能为空");
 		// 发送消息，将 Object 转换为 Map
 		send(subject, QmqUtil.objToMap(content), date);
 	}
@@ -140,6 +198,10 @@ public class QmqTemplate {
 	 * @param date 消息发送日期，用于延迟或定时发送
 	 */
 	private void send(String subject, Map<String, Object> content, Date date) {
+		// 参数校验
+		Assert.hasText(subject, "QMQ 消息发送主题 Subject 不能为空");
+		Assert.notEmpty(content, "QMQ 消息发送内容 Content 不能为空");
+
 		// 转换消息对象
 		Message message = convertMessage(subject, content);
 		// 装载延迟消息时间
@@ -161,11 +223,8 @@ public class QmqTemplate {
 	 * @return {@link Message} 消息实体
 	 */
 	private Message convertMessage(String subject, Map<String, Object> content) {
-		// 判断消息内容
-		Assert.notEmpty(content, "QMQ 消息发送内容 Content 不能为空");
-
 		// init message
-		Message message = initMessage(subject);
+		Message message = producer.generateMessage(subject);
 		Assert.notNull(message, "QMQ 消息发送对象 Message 不能为空");
 
 		// 遍历装载消息内容
@@ -176,14 +235,14 @@ public class QmqTemplate {
 				continue;
 			}
 			// 根据数据类型，选择 set 方法
-			chooseMessage(message, entry);
+			bindMessage(message, entry);
 		}
 
 		return message;
 	}
 
 	/**
-	 * 装载单条消息键值对
+	 * 组装消息键值对
 	 * <p>QMQ 目前支持的数据类型包含：</p>
 	 * <ol>
 	 *     <li>{@link Boolean}</li>
@@ -197,7 +256,7 @@ public class QmqTemplate {
 	 * @param message 消息对象
 	 * @param entry 单条消息键值对
 	 */
-	private void chooseMessage(Message message, Map.Entry<String, Object> entry) {
+	private void bindMessage(Message message, Map.Entry<String, Object> entry) {
 		// 声明消息内容的键值对
 		String key = entry.getKey();
 		Object value = entry.getValue();
@@ -229,39 +288,29 @@ public class QmqTemplate {
 	}
 
 	/**
-	 * 初始化消息实体
-	 * @param subject 消息主题
-	 * @return {@link Message} 消息实体
-	 */
-	private Message initMessage(String subject) {
-		// 判断消息发送主题
-		Assert.hasText(subject, "QMQ 消息发送主题 Subject 不能为空");
-
-		// 传入消息发送主题，返回消息对象
-		return producer.generateMessage(subject);
-	}
-
-	/**
 	 * 异步发送消息，支持回调方法
-	 * <p>QMQ 暂时不支持同步发送消息，如果需要同步发送，要通过修改源代码实现</p>
+	 * <ul>
+	 *     <li>默认的毁掉方法仅打印发送结果日志</li>
+	 *     <li>QMQ 暂时不支持同步发送消息，如果需要同步发送，要通过修改源代码实现</li>
+	 * </ul>
 	 * @param message {@link Message} 消息实体
 	 */
 	private void sendMessage(Message message) {
-		// 判断消息对象
-		Assert.notNull(message, "QMQ 消息发送对象 Message 不能为空");
-
+		// TODO 需要支持自定义的回调，使用链式调用方法
 		// 发送消息，并返回回调结果
 		producer.sendMessage(message, new MessageSendStateListener() {
+			Gson gson = new Gson();
+
 			@Override
 			public void onSuccess(Message message) {
 				// send success
-				log.info("QMQ 发送异步消息成功，消息主题：{}，消息内容：{}", message.getSubject(), message.getAttrs());
+				log.info("QMQ 发送异步消息成功，消息主题：{}，消息内容：{}", message.getSubject(), gson.toJson(message));
 			}
 
 			@Override
 			public void onFailed(Message message) {
 				// send failed
-				log.error("QMQ 发送异步消息失败，消息主题：{}，消息内容：{}", message.getSubject(), message.getAttrs());
+				log.error("QMQ 发送异步消息失败，消息主题：{}，消息内容：{}", message.getSubject(), gson.toJson(message));
 			}
 		});
 	}

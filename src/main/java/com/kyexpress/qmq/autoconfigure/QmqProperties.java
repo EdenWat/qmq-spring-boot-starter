@@ -194,7 +194,7 @@ public class QmqProperties {
 	 * QMQ 消息接收者配置
 	 */
 	public static class Consumer {
-
+		// TODO 消费者待开发
 	}
 
 	/**
