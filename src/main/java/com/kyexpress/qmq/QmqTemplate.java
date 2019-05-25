@@ -1,6 +1,5 @@
 package com.kyexpress.qmq;
 
-import com.google.gson.Gson;
 import com.kyexpress.qmq.autoconfigure.QmqProperties;
 import com.kyexpress.qmq.constant.TimeUnitEnum;
 import com.kyexpress.qmq.util.QmqUtil;
@@ -10,6 +9,7 @@ import org.springframework.util.Assert;
 import qunar.tc.qmq.Message;
 import qunar.tc.qmq.MessageProducer;
 import qunar.tc.qmq.MessageSendStateListener;
+import qunar.tc.qmq.base.BaseMessage;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -30,10 +30,6 @@ public class QmqTemplate {
 	 * QMQ 自动配置属性
 	 */
 	private QmqProperties properties;
-	/**
-	 * 使用 GSON 进行 JSON 转换
-	 */
-	Gson gson = new Gson();
 
 	/**
 	 * Init QmqTemplate
@@ -207,7 +203,7 @@ public class QmqTemplate {
 		Assert.notEmpty(content, "QMQ 消息发送内容 Content 不能为空");
 
 		// 转换消息对象
-		Message message = convertMessage(subject, content);
+		BaseMessage message = convertMessage(subject, content);
 		// 装载延迟消息时间
 		if (date != null && date.getTime() > System.currentTimeMillis()) {
 			message.setDelayTime(date);
@@ -221,15 +217,12 @@ public class QmqTemplate {
 	 * 组装消息对象
 	 * @param subject 消息主题
 	 * @param content 消息内容
-	 * @return {@link Message} 消息实体
+	 * @return {@link BaseMessage} 消息实体
 	 */
-	private Message convertMessage(String subject, Map<String, Object> content) {
+	private BaseMessage convertMessage(String subject, Map<String, Object> content) {
 		// init message
-		Message message = producer.generateMessage(subject);
-		Assert.notNull(message, "QMQ 消息发送对象 Message 不能为空");
-		if (log.isDebugEnabled()) {
-			log.debug("QMQ Message 对象初始化成功，消息主题：{}", subject);
-		}
+		BaseMessage message = (BaseMessage) producer.generateMessage(subject);
+		Assert.notNull(message, "QMQ 消息发送对象 BaseMessage 不能为空");
 
 		// 遍历装载消息内容
 		for (Map.Entry<String, Object> entry : content.entrySet()) {
@@ -260,7 +253,7 @@ public class QmqTemplate {
 	 * @param message 消息对象
 	 * @param entry 单条消息键值对
 	 */
-	private void bindMessage(Message message, Map.Entry<String, Object> entry) {
+	private void bindMessage(BaseMessage message, Map.Entry<String, Object> entry) {
 		// 声明消息内容的键值对
 		String key = entry.getKey();
 		Object value = entry.getValue();
@@ -297,11 +290,11 @@ public class QmqTemplate {
 	 *     <li>默认的毁掉方法仅打印发送结果日志</li>
 	 *     <li>QMQ 暂时不支持同步发送消息，如果需要同步发送，要通过修改源代码实现</li>
 	 * </ul>
-	 * @param message {@link Message} 消息实体
+	 * @param message {@link BaseMessage} 消息实体
 	 */
-	private void sendMessage(Message message) {
+	private void sendMessage(BaseMessage message) {
 		if (log.isDebugEnabled()) {
-			log.debug("QMQ 异步消息准备发送，消息主题：{}，消息内容：{}", message.getSubject(), gson.toJson(message));
+			log.debug("QMQ 异步消息准备发送，消息主题：{}，消息内容：{}", message.getSubject(), message.getAttrs());
 		}
 
 		// TODO 需要支持自定义的回调，使用链式调用方法
@@ -310,13 +303,13 @@ public class QmqTemplate {
 			@Override
 			public void onSuccess(Message message) {
 				// send success
-				log.info("QMQ 异步消息发送成功，消息主题：{}，消息内容：{}", message.getSubject(), gson.toJson(message));
+				log.info("QMQ 异步消息发送成功，消息主题：{}，消息内容：{}", message.getSubject(), ((BaseMessage) message).getAttrs());
 			}
 
 			@Override
 			public void onFailed(Message message) {
 				// send failed
-				log.error("QMQ 异步消息发送失败，消息主题：{}，消息内容：{}", message.getSubject(), gson.toJson(message));
+				log.error("QMQ 异步消息发送失败，消息主题：{}，消息内容：{}", message.getSubject(), ((BaseMessage) message).getAttrs());
 			}
 		});
 	}
