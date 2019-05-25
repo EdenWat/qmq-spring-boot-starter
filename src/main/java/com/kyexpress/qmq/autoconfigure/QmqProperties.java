@@ -130,13 +130,11 @@ public class QmqProperties {
 		/**
 		 * 发送消息超时时间，单位：毫秒，默认 5 秒超时；源代码中没有 set 方法，未生效
 		 */
-		@Deprecated
 		private Long sendTimeoutMillis = QmqConstant.DEFAULT_SEND_TIMEOUT_MILLIS;
 
 		/**
 		 * 是否同步发送，默认使用异步发送；源代码中没有 set 方法，未生效
 		 */
-		@Deprecated
 		private boolean syncSend = false;
 
 		public Integer getMaxQueueSize() {
@@ -177,6 +175,7 @@ public class QmqProperties {
 					QmqConstant.DEFAULT_SEND_TIMEOUT_MILLIS;
 		}
 
+		@Deprecated
 		public void setSendTimeoutMillis(Long sendTimeoutMillis) {
 			this.sendTimeoutMillis = sendTimeoutMillis;
 		}
@@ -185,6 +184,7 @@ public class QmqProperties {
 			return syncSend;
 		}
 
+		@Deprecated
 		public void setSyncSend(boolean syncSend) {
 			this.syncSend = syncSend;
 		}
