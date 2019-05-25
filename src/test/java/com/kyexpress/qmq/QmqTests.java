@@ -6,8 +6,6 @@ import qunar.tc.qmq.MessageProducer;
 import qunar.tc.qmq.MessageSendStateListener;
 
 import javax.annotation.Resource;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CountDownLatch;
 
 public class QmqTests {
@@ -41,12 +39,7 @@ public class QmqTests {
 	}
 
 	@Test
-	public void test() throws UnsupportedEncodingException {
-		String str = "中国";
-
-		System.out.println(str.length());
-		System.out.println(str.getBytes(StandardCharsets.UTF_8).length);
-
+	public void test() {
 
 	}
 }

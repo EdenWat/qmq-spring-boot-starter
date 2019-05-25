@@ -1,9 +1,8 @@
 package com.kyexpress.qmq.autoconfigure;
 
 import com.kyexpress.qmq.QmqTemplate;
-import com.kyexpress.qmq.constant.QmqConstant;
+import com.kyexpress.qmq.util.QmqUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -33,21 +32,17 @@ public class QmqAutoConfigure {
 	public MessageProducer producer(QmqProperties properties) {
 		MessageProducerProvider producer = new MessageProducerProvider();
 		// appCode
-		producer.setAppCode(StringUtils.defaultString(properties.getAppCode(), QmqConstant.DEFAULT_APP_CODE));
+		producer.setAppCode(properties.getAppCode());
 		// metaServer address
-		producer.setMetaServer(StringUtils.defaultString(properties.getMetaServer(), QmqConstant.DEFAULT_META_SERVER));
+		producer.setMetaServer(QmqUtil.defaultMetaServer(properties));
 		// 异步发送队列大小，默认10000
-		producer.setMaxQueueSize(
-				properties.getMaxQueueSize() > 0 ? properties.getMaxQueueSize() : QmqConstant.DEFAULT_MAX_QUEUE_SIZE);
+		producer.setMaxQueueSize(properties.getProducer().getMaxQueueSize());
 		// 发送线程数，默认3
-		producer.setSendThreads(
-				properties.getSendThreads() > 0 ? properties.getSendThreads() : QmqConstant.DEFAULT_SEND_THREADS);
+		producer.setSendThreads(properties.getProducer().getSendThreads());
 		// 默认每次发送时最大批量大小，默认30
-		producer.setSendBatch(
-				properties.getSendBatch() > 0 ? properties.getSendBatch() : QmqConstant.DEFAULT_SEND_BATCH);
+		producer.setSendBatch(properties.getProducer().getSendBatch());
 		// 如果消息发送失败，重试次数，默认10
-		producer.setSendTryCount(
-				properties.getSendTryCount() > 0 ? properties.getSendTryCount() : QmqConstant.DEFAULT_SEND_TRY_COUNT);
+		producer.setSendTryCount(properties.getProducer().getSendTryCount());
 
 		if (log.isDebugEnabled()) {
 			log.debug("init qmq MessageProducer success");

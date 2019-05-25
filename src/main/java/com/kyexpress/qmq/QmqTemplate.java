@@ -2,17 +2,14 @@ package com.kyexpress.qmq;
 
 import com.kyexpress.qmq.autoconfigure.QmqProperties;
 import com.kyexpress.qmq.constant.TimeUnitEnum;
+import com.kyexpress.qmq.util.QmqUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 import qunar.tc.qmq.Message;
 import qunar.tc.qmq.MessageProducer;
 import qunar.tc.qmq.MessageSendStateListener;
 
-import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Map;
@@ -50,8 +47,27 @@ public class QmqTemplate {
 	 * @param timeUnit 延时时间单位
 	 * @see com.kyexpress.qmq.constant.QmqConstant#DEFAULT_SUBJECT
 	 */
-	public void sendDelay(Map<String, Object> content, long duration, TimeUnit timeUnit) {
-		sendDelay(properties.getDefaultSubject(), content, duration, timeUnit);
+	public void sendDelayDefault(Map<String, Object> content, long duration, TimeUnit timeUnit) {
+		sendDelay(properties.getTemplate().getDefaultSubject(), content, duration, timeUnit);
+	}
+
+	/**
+	 * 发送定时消息到默认主题
+	 * @param content 消息内容
+	 * @param date {@link Date} 消息发送日期，用于延迟或定时发送
+	 * @see com.kyexpress.qmq.constant.QmqConstant#DEFAULT_SUBJECT
+	 */
+	public void sendDelayDefault(Map<String, Object> content, Date date) {
+		sendDelay(properties.getTemplate().getDefaultSubject(), content, date);
+	}
+
+	/**
+	 * 发送即时消息到默认主题
+	 * @param content 消息内容
+	 * @see com.kyexpress.qmq.constant.QmqConstant#DEFAULT_SUBJECT
+	 */
+	public void sendDefault(Map<String, Object> content) {
+		send(properties.getTemplate().getDefaultSubject(), content);
 	}
 
 	/**
@@ -82,16 +98,6 @@ public class QmqTemplate {
 	}
 
 	/**
-	 * 发送定时消息到默认主题
-	 * @param content 消息内容
-	 * @param date {@link Date} 消息发送日期，用于延迟或定时发送
-	 * @see com.kyexpress.qmq.constant.QmqConstant#DEFAULT_SUBJECT
-	 */
-	public void sendDelay(Map<String, Object> content, Date date) {
-		sendDelay(properties.getDefaultSubject(), content, date);
-	}
-
-	/**
 	 * 发送定时消息到指定主题
 	 * @param subject 消息主题
 	 * @param content 消息内容
@@ -103,15 +109,6 @@ public class QmqTemplate {
 		Assert.isTrue(date.getTime() > System.currentTimeMillis(), "消息定时接收时间不能为过去时");
 
 		send(subject, content, date);
-	}
-
-	/**
-	 * 发送即时消息到默认主题
-	 * @param content 消息内容
-	 * @see com.kyexpress.qmq.constant.QmqConstant#DEFAULT_SUBJECT
-	 */
-	public void send(Map<String, Object> content) {
-		send(properties.getDefaultSubject(), content);
 	}
 
 	/**
@@ -133,7 +130,7 @@ public class QmqTemplate {
 		// 消息对象不能为空
 		Assert.notNull(content, "QMQ 消息发送对象 Content 不能为空");
 		// 发送消息，将 Object 转换为 Map
-		send(subject, objToMap(content), date);
+		send(subject, QmqUtil.objToMap(content), date);
 	}
 
 	/**
@@ -145,7 +142,6 @@ public class QmqTemplate {
 	private void send(String subject, Map<String, Object> content, Date date) {
 		// 转换消息对象
 		Message message = convertMessage(subject, content);
-
 		// 装载延迟消息时间
 		if (date != null && date.getTime() > System.currentTimeMillis()) {
 			message.setDelayTime(date);
@@ -154,7 +150,6 @@ public class QmqTemplate {
 		if (log.isDebugEnabled()) {
 			log.debug("QMQ 消息准备发送，发送时间：{}，消息主题：{}，消息内容：{}", message.getCreatedTime(), subject, content);
 		}
-
 		// 发送消息
 		sendMessage(message);
 	}
@@ -173,48 +168,64 @@ public class QmqTemplate {
 		Message message = initMessage(subject);
 		Assert.notNull(message, "QMQ 消息发送对象 Message 不能为空");
 
-		// 声明消息内容的键值对
-		String key;
-		Object value;
-
 		// 遍历装载消息内容
 		for (Map.Entry<String, Object> entry : content.entrySet()) {
-			// 获取消息内容的键值对
-			key = entry.getKey();
-			value = entry.getValue();
-
-			if (StringUtils.isBlank(key) || value == null) {
-				log.warn("QMQ 消息内容的键值对为空，key：{}，value：{}", key, value);
+			// 键值对校验
+			if (StringUtils.isBlank(entry.getKey()) || entry.getValue() == null) {
+				log.warn("QMQ 消息内容的键值对为空，key：{}，value：{}", entry.getKey(), entry.getValue());
 				continue;
 			}
-
-			// 判断 value 的数据类型，并装载消息内容
-			if (value instanceof Boolean) {
-				message.setProperty(key, (Boolean) value);
-			} else if (value instanceof Integer) {
-				message.setProperty(key, (Integer) value);
-			} else if (value instanceof Long) {
-				message.setProperty(key, (Long) value);
-			} else if (value instanceof Float) {
-				message.setProperty(key, (Float) value);
-			} else if (value instanceof Double) {
-				message.setProperty(key, (Double) value);
-			} else if (value instanceof Date) {
-				message.setProperty(key, (Date) value);
-			} else if (value instanceof String) {
-				String str = (String) value;
-				// 判断字符串大小是否超过32K，使用 UTF-8 编码
-				if (greaterThan32K(str, StandardCharsets.UTF_8)) {
-					message.setLargeString(key, str);
-				} else {
-					message.setProperty(key, str);
-				}
-			} else {
-				throw new IllegalStateException("Unexpected value: " + value.getClass());
-			}
+			// 根据数据类型，选择 set 方法
+			chooseMessage(message, entry);
 		}
 
 		return message;
+	}
+
+	/**
+	 * 装载单条消息键值对
+	 * <p>QMQ 目前支持的数据类型包含：</p>
+	 * <ol>
+	 *     <li>{@link Boolean}</li>
+	 *     <li>{@link Integer}</li>
+	 *     <li>{@link Long}</li>
+	 *     <li>{@link Float}</li>
+	 *     <li>{@link Double}</li>
+	 *     <li>{@link Date}</li>
+	 *     <li>{@link String}</li>
+	 * </ol>
+	 * @param message 消息对象
+	 * @param entry 单条消息键值对
+	 */
+	private void chooseMessage(Message message, Map.Entry<String, Object> entry) {
+		// 声明消息内容的键值对
+		String key = entry.getKey();
+		Object value = entry.getValue();
+
+		// 判断 value 的数据类型，并装载消息内容
+		if (value instanceof Boolean) {
+			message.setProperty(key, (Boolean) value);
+		} else if (value instanceof Integer) {
+			message.setProperty(key, (Integer) value);
+		} else if (value instanceof Long) {
+			message.setProperty(key, (Long) value);
+		} else if (value instanceof Float) {
+			message.setProperty(key, (Float) value);
+		} else if (value instanceof Double) {
+			message.setProperty(key, (Double) value);
+		} else if (value instanceof Date) {
+			message.setProperty(key, (Date) value);
+		} else if (value instanceof String) {
+			String str = (String) value;
+			// 判断字符串大小是否超过32K，使用 UTF-8 编码
+			if (QmqUtil.greaterThan32K(str, StandardCharsets.UTF_8)) {
+				message.setLargeString(key, str);
+			} else {
+				message.setProperty(key, str);
+			}
+		} else {
+			throw new IllegalStateException("Unexpected value: " + value.getClass());
+		}
 	}
 
 	/**
@@ -253,53 +264,5 @@ public class QmqTemplate {
 				log.error("QMQ 发送异步消息失败，消息主题：{}，消息内容：{}", message.getSubject(), message.getAttrs());
 			}
 		});
-	}
-
-	/**
-	 * 比较字符串大小是否超过32K
-	 * <ul>
-	 *     <li>QMQ的Message.setProperty(key, value)如果value是字符串，则value的大小默认不能超过32K</li>
-	 *     <li>如果你需要传输超大的字符串，请务必使用message.setLargeString(key, value)，这样你甚至可以传输十几兆的内容了</li>
-	 *     <li>但是消费消息的时候也需要使用message.getLargeString(key)</li>
-	 * </ul>
-	 * @param str 字符串
-	 * @param charset 字符编码
-	 * @return true or false
-	 */
-	@SuppressWarnings("SameParameterValue")
-	private boolean greaterThan32K(String str, Charset charset) {
-		// 字符串为空，直接返回 false，即使用 Message.setProperty(key, value)
-		if (StringUtils.isBlank(str)) {
-			return false;
-		}
-
-		// 使用指定编码，计算出字节数
-		// 将 32k 转换为字节，1 KB = 1024 bytes
-		return str.getBytes(charset).length >= 32 * 1024;
-	}
-
-	/**
-	 * 将 Object 转换为 Map
-	 * @param object 消息对象
-	 * @return Map
-	 */
-	private Map<String, Object> objToMap(Object object) {
-		Map<String, Object> describe = null;
-
-		try {
-			// 将 Object 转换为 Map
-			describe = PropertyUtils.describe(object);
-			if (CollectionUtils.isEmpty(describe)) {
-				log.warn("QMQ 消息对象无法转换为 Map ，转换结果为空");
-				return null;
-			}
-
-			// 移除 Object 的 class 名称
-			describe.remove("class");
-		} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
-			log.error("QMQ 消息对象无法转换为 Map", ex);
-		}
-
-		return describe;
 	}
 }

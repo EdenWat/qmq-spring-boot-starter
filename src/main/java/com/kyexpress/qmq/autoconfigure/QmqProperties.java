@@ -1,19 +1,18 @@
 package com.kyexpress.qmq.autoconfigure;
 
 import com.kyexpress.qmq.constant.QmqConstant;
-import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author kye
  */
-@Data
 @ConfigurationProperties("spring.qmq")
 public class QmqProperties {
 	/**
 	 * 是否开启 QMQ，默认值 true
 	 */
-	private boolean enabled = true;
+	private boolean enabled = false;
 
 	/**
 	 * QMQ AppCode，默认值 qmq_default_code
@@ -21,46 +20,199 @@ public class QmqProperties {
 	private String appCode = QmqConstant.DEFAULT_APP_CODE;
 
 	/**
-	 * QMQ MetaServer Address，默认值 http://127.0.0.1:8080/meta/address
+	 * QMQ MetaServer Address，默认值 http://127.0.0.1:8080/meta/address，
+	 * 可使用 host 和 port 配置替换
 	 */
 	private String metaServer = QmqConstant.DEFAULT_META_SERVER;
 
 	/**
-	 * 异步发送队列大小，默认 10000
+	 * QMQ MetaServer host，可使用 metaServer 配置替换，优先使用 host:port
 	 */
-	private int maxQueueSize = QmqConstant.DEFAULT_MAX_QUEUE_SIZE;
+	private String host;
 
 	/**
-	 * 发送线程数，默认 3
+	 * QMQ MetaServer port，可使用 metaServer 配置替换，优先使用 host:port
 	 */
-	private int sendThreads = QmqConstant.DEFAULT_SEND_THREADS;
+	private Integer port;
 
 	/**
-	 * 默认每次发送时最大批量大小，默认 30
+	 * QMQ 消息发送者配置
 	 */
-	private int sendBatch = QmqConstant.DEFAULT_SEND_BATCH;
+	private final Producer producer = new Producer();
 
 	/**
-	 * 如果消息发送失败，重试次数，默认 10
+	 * QMQ 消息接收者配置
 	 */
-	private int sendTryCount = QmqConstant.DEFAULT_SEND_TRY_COUNT;
+	private final Consumer consumer = new Consumer();
 
 	/**
-	 * 发送消息超时时间，单位：毫秒，默认 5 秒超时；
-	 * 源代码中没有 set 方法，未生效
+	 * QMQ 消息发送模板配置
+	 * @see com.kyexpress.qmq.QmqTemplate
 	 */
-	@Deprecated
-	private long sendTimeoutMillis = 5000L;
+	private final Template template = new Template();
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public String getAppCode() {
+		return StringUtils.defaultString(appCode, QmqConstant.DEFAULT_APP_CODE);
+	}
+
+	public void setAppCode(String appCode) {
+		this.appCode = appCode;
+	}
+
+	public String getMetaServer() {
+		return StringUtils.defaultString(metaServer, QmqConstant.DEFAULT_META_SERVER);
+	}
+
+	public void setMetaServer(String metaServer) {
+		this.metaServer = metaServer;
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public Integer getPort() {
+		return port;
+	}
+
+	public void setPort(Integer port) {
+		this.port = port;
+	}
+
+	public Producer getProducer() {
+		return producer;
+	}
+
+	public Consumer getConsumer() {
+		return consumer;
+	}
+
+	public Template getTemplate() {
+		return template;
+	}
 
 	/**
-	 * 是否同步发送，默认使用异步发送；
-	 * 源代码中没有 set 方法，未生效
+	 * QMQ 消息发送者配置
 	 */
-	@Deprecated
-	private boolean syncSend = false;
+	public static class Producer {
+		/**
+		 * 异步发送队列大小，默认 10000
+		 */
+		private Integer maxQueueSize = QmqConstant.DEFAULT_MAX_QUEUE_SIZE;
+
+		/**
+		 * 发送线程数，默认 3
+		 */
+		private Integer sendThreads = QmqConstant.DEFAULT_SEND_THREADS;
+
+		/**
+		 * 默认每次发送时最大批量大小，默认 30
+		 */
+		private Integer sendBatch = QmqConstant.DEFAULT_SEND_BATCH;
+
+		/**
+		 * 如果消息发送失败，重试次数，默认 10
+		 */
+		private Integer sendTryCount = QmqConstant.DEFAULT_SEND_TRY_COUNT;
+
+		/**
+		 * 发送消息超时时间，单位：毫秒，默认 5 秒超时；源代码中没有 set 方法，未生效
+		 */
+		@Deprecated
+		private Long sendTimeoutMillis = QmqConstant.DEFAULT_SEND_TIMEOUT_MILLIS;
+
+		/**
+		 * 是否同步发送，默认使用异步发送；源代码中没有 set 方法，未生效
+		 */
+		@Deprecated
+		private boolean syncSend = false;
+
+		public Integer getMaxQueueSize() {
+			return maxQueueSize != null && maxQueueSize > 0 ? maxQueueSize : QmqConstant.DEFAULT_MAX_QUEUE_SIZE;
+		}
+
+		public void setMaxQueueSize(Integer maxQueueSize) {
+			this.maxQueueSize = maxQueueSize;
+		}
+
+		public Integer getSendThreads() {
+			return sendThreads != null && sendThreads > 0 ? sendThreads : QmqConstant.DEFAULT_SEND_THREADS;
+		}
+
+		public void setSendThreads(Integer sendThreads) {
+			this.sendThreads = sendThreads;
+		}
+
+		public Integer getSendBatch() {
+			return sendBatch != null && sendBatch > 0 ? sendBatch : QmqConstant.DEFAULT_SEND_BATCH;
+		}
+
+		public void setSendBatch(Integer sendBatch) {
+			this.sendBatch = sendBatch;
+		}
+
+		public Integer getSendTryCount() {
+			return sendTryCount != null && sendTryCount > 0 ? sendTryCount : QmqConstant.DEFAULT_SEND_TRY_COUNT;
+		}
+
+		public void setSendTryCount(Integer sendTryCount) {
+			this.sendTryCount = sendTryCount;
+		}
+
+		public Long getSendTimeoutMillis() {
+			return sendTimeoutMillis != null && sendTimeoutMillis > 0 ?
+					sendTimeoutMillis :
+					QmqConstant.DEFAULT_SEND_TIMEOUT_MILLIS;
+		}
+
+		public void setSendTimeoutMillis(Long sendTimeoutMillis) {
+			this.sendTimeoutMillis = sendTimeoutMillis;
+		}
+
+		public boolean isSyncSend() {
+			return syncSend;
+		}
+
+		public void setSyncSend(boolean syncSend) {
+			this.syncSend = syncSend;
+		}
+	}
 
 	/**
-	 * 默认消息发送主题，默认值 qmq_default_subject
+	 * QMQ 消息接收者配置
 	 */
-	private String defaultSubject = QmqConstant.DEFAULT_SUBJECT;
+	public static class Consumer {
+
+	}
+
+	/**
+	 * QMQ 消息发送模板配置
+	 * @see com.kyexpress.qmq.QmqTemplate
+	 */
+	public static class Template {
+		/**
+		 * 默认消息发送主题，默认值 qmq_default_subject
+		 */
+		private String defaultSubject = QmqConstant.DEFAULT_SUBJECT;
+
+		public String getDefaultSubject() {
+			return StringUtils.defaultString(defaultSubject, QmqConstant.DEFAULT_SUBJECT);
+		}
+
+		public void setDefaultSubject(String defaultSubject) {
+			this.defaultSubject = defaultSubject;
+		}
+	}
 }
