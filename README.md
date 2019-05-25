@@ -1,5 +1,15 @@
 # qmq-spring-boot-starter
 
+## Maven 依赖
+```
+<dependency>
+    <groupId>com.kyexpress.qmq</groupId>
+    <artifactId>qmq-spring-boot-starter</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
+
+## Spring Boot 配置（YML）
 ```
 spring:
   application:
