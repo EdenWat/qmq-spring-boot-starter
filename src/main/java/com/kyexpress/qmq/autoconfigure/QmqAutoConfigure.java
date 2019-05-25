@@ -31,21 +31,24 @@ public class QmqAutoConfigure {
 	@ConditionalOnProperty(prefix = "spring.qmq", value = "enabled", havingValue = "true")
 	public MessageProducer producer(QmqProperties properties) {
 		MessageProducerProvider producer = new MessageProducerProvider();
+		QmqProperties.Producer prop = properties.getProducer();
 		// appCode
 		producer.setAppCode(properties.getAppCode());
 		// metaServer address
 		producer.setMetaServer(QmqUtil.defaultMetaServer(properties));
 		// 异步发送队列大小，默认10000
-		producer.setMaxQueueSize(properties.getProducer().getMaxQueueSize());
+		producer.setMaxQueueSize(prop.getMaxQueueSize());
 		// 发送线程数，默认3
-		producer.setSendThreads(properties.getProducer().getSendThreads());
+		producer.setSendThreads(prop.getSendThreads());
 		// 默认每次发送时最大批量大小，默认30
-		producer.setSendBatch(properties.getProducer().getSendBatch());
+		producer.setSendBatch(prop.getSendBatch());
 		// 如果消息发送失败，重试次数，默认10
-		producer.setSendTryCount(properties.getProducer().getSendTryCount());
+		producer.setSendTryCount(prop.getSendTryCount());
 
 		if (log.isDebugEnabled()) {
-			log.debug("Init QMQ MessageProducer Success");
+			log.debug(
+					"Init QMQ MessageProducer Success, maxQueueSize: {}, sendThreads: {}, sendBatch: {},  sendTryCount: {}",
+					prop.getMaxQueueSize(), prop.getSendThreads(), prop.getSendBatch(), prop.getSendTryCount());
 		}
 
 		return producer;
