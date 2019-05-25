@@ -1,22 +1,19 @@
 package com.kyexpress.qmq;
 
-import org.junit.Before;
 import org.junit.Test;
 import qunar.tc.qmq.Message;
+import qunar.tc.qmq.MessageProducer;
 import qunar.tc.qmq.MessageSendStateListener;
-import qunar.tc.qmq.producer.MessageProducerProvider;
 
+import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CountDownLatch;
 
 public class QmqTests {
 
-	private MessageProducerProvider producer;
-
-	@Before
-	public void init() {
-		producer = new MessageProducerProvider();
-		producer.init();
-	}
+	@Resource
+	private MessageProducer producer;
 
 	@Test
 	public void test_qmq_send_message() {
@@ -41,5 +38,15 @@ public class QmqTests {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Test
+	public void test() throws UnsupportedEncodingException {
+		String str = "中国";
+
+		System.out.println(str.length());
+		System.out.println(str.getBytes(StandardCharsets.UTF_8).length);
+
+
 	}
 }

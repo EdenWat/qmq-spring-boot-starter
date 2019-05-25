@@ -3,12 +3,17 @@ package com.kyexpress.qmq;
 import com.kyexpress.qmq.autoconfigure.QmqProperties;
 import com.kyexpress.qmq.constant.TimeUnitEnum;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import qunar.tc.qmq.Message;
 import qunar.tc.qmq.MessageProducer;
 import qunar.tc.qmq.MessageSendStateListener;
 
+import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -68,8 +73,8 @@ public class QmqTemplate {
 	 */
 	public void sendDelay(String subject, Map<String, Object> content, long duration, TimeUnit timeUnit) {
 		// 判断消息延迟发送时间
-		Assert.isTrue(duration > 0, "消息延迟发送时间不能为过去时");
-		Assert.notNull(timeUnit, "消息延迟发送时间单位不能为空");
+		Assert.isTrue(duration > 0, "消息延迟接收时间不能为过去时");
+		Assert.notNull(timeUnit, "消息延迟接收时间单位不能为空");
 		// 讲延迟时间转换为毫秒
 		long sendTime = System.currentTimeMillis() + timeUnit.toMillis(duration);
 
@@ -94,8 +99,8 @@ public class QmqTemplate {
 	 */
 	public void sendDelay(String subject, Map<String, Object> content, Date date) {
 		// 判断消息定时发送时间
-		Assert.notNull(date, "消息定时发送时间不能为空");
-		Assert.isTrue(date.getTime() > System.currentTimeMillis(), "消息定时发送时间不能为过去时");
+		Assert.notNull(date, "消息定时接收时间不能为空");
+		Assert.isTrue(date.getTime() > System.currentTimeMillis(), "消息定时接收时间不能为过去时");
 
 		send(subject, content, date);
 	}
@@ -119,10 +124,23 @@ public class QmqTemplate {
 	}
 
 	/**
-	 * 发送消息
+	 * 发送消息，消息内容使用 Object
+	 * @param subject 消息主题
+	 * @param content 消息对象
+	 * @param date 消息发送日期，用于延迟或定时发送
+	 */
+	private void send(String subject, Object content, Date date) {
+		// 消息对象不能为空
+		Assert.notNull(content, "QMQ 消息发送对象 Content 不能为空");
+		// 发送消息，将 Object 转换为 Map
+		send(subject, objToMap(content), date);
+	}
+
+	/**
+	 * 发送消息，消息内容使用 Map
 	 * @param subject 消息主题
 	 * @param content 消息内容
-	 * @param date {@link Date} 消息发送日期，用于延迟或定时发送
+	 * @param date 消息发送日期，用于延迟或定时发送
 	 */
 	private void send(String subject, Map<String, Object> content, Date date) {
 		// 转换消息对象
@@ -131,6 +149,10 @@ public class QmqTemplate {
 		// 装载延迟消息时间
 		if (date != null && date.getTime() > System.currentTimeMillis()) {
 			message.setDelayTime(date);
+		}
+
+		if (log.isDebugEnabled()) {
+			log.debug("QMQ 消息准备发送，发送时间：{}，消息主题：{}，消息内容：{}", message.getCreatedTime(), subject, content);
 		}
 
 		// 发送消息
@@ -181,11 +203,11 @@ public class QmqTemplate {
 				message.setProperty(key, (Date) value);
 			} else if (value instanceof String) {
 				String str = (String) value;
-				// TODO 判断字符串大小是否超过32K
-				if (StringUtils.length(str) < 32) {
-					message.setProperty(key, str);
-				} else {
+				// 判断字符串大小是否超过32K，使用 UTF-8 编码
+				if (greaterThan32K(str, StandardCharsets.UTF_8)) {
 					message.setLargeString(key, str);
+				} else {
+					message.setProperty(key, str);
 				}
 			} else {
 				throw new IllegalStateException("Unexpected value: " + value.getClass());
@@ -231,5 +253,53 @@ public class QmqTemplate {
 				log.error("QMQ 发送异步消息失败，消息主题：{}，消息内容：{}", message.getSubject(), message.getAttrs());
 			}
 		});
+	}
+
+	/**
+	 * 比较字符串大小是否超过32K
+	 * <ul>
+	 *     <li>QMQ的Message.setProperty(key, value)如果value是字符串，则value的大小默认不能超过32K</li>
+	 *     <li>如果你需要传输超大的字符串，请务必使用message.setLargeString(key, value)，这样你甚至可以传输十几兆的内容了</li>
+	 *     <li>但是消费消息的时候也需要使用message.getLargeString(key)</li>
+	 * </ul>
+	 * @param str 字符串
+	 * @param charset 字符编码
+	 * @return true or false
+	 */
+	@SuppressWarnings("SameParameterValue")
+	private boolean greaterThan32K(String str, Charset charset) {
+		// 字符串为空，直接返回 false，即使用 Message.setProperty(key, value)
+		if (StringUtils.isBlank(str)) {
+			return false;
+		}
+
+		// 使用指定编码，计算出字节数
+		// 将 32k 转换为字节，1 KB = 1024 bytes
+		return str.getBytes(charset).length >= 32 * 1024;
+	}
+
+	/**
+	 * 将 Object 转换为 Map
+	 * @param object 消息对象
+	 * @return Map
+	 */
+	private Map<String, Object> objToMap(Object object) {
+		Map<String, Object> describe = null;
+
+		try {
+			// 将 Object 转换为 Map
+			describe = PropertyUtils.describe(object);
+			if (CollectionUtils.isEmpty(describe)) {
+				log.warn("QMQ 消息对象无法转换为 Map ，转换结果为空");
+				return null;
+			}
+
+			// 移除 Object 的 class 名称
+			describe.remove("class");
+		} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
+			log.error("QMQ 消息对象无法转换为 Map", ex);
+		}
+
+		return describe;
 	}
 }
