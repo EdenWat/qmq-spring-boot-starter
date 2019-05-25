@@ -10,7 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("spring.qmq")
 public class QmqProperties {
 	/**
-	 * 是否开启 QMQ，默认值 true
+	 * 是否开启 QMQ，默认值 false
 	 */
 	private boolean enabled = false;
 
