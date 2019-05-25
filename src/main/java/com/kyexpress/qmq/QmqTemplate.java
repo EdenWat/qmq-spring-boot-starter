@@ -30,6 +30,10 @@ public class QmqTemplate {
 	 * QMQ 自动配置属性
 	 */
 	private QmqProperties properties;
+	/**
+	 * 使用 GSON 进行 JSON 转换
+	 */
+	Gson gson = new Gson();
 
 	/**
 	 * Init QmqTemplate
@@ -209,9 +213,6 @@ public class QmqTemplate {
 			message.setDelayTime(date);
 		}
 
-		if (log.isDebugEnabled()) {
-			log.debug("QMQ 消息准备发送，发送时间：{}，消息主题：{}，消息内容：{}", message.getCreatedTime(), subject, content);
-		}
 		// 发送消息
 		sendMessage(message);
 	}
@@ -226,6 +227,9 @@ public class QmqTemplate {
 		// init message
 		Message message = producer.generateMessage(subject);
 		Assert.notNull(message, "QMQ 消息发送对象 Message 不能为空");
+		if (log.isDebugEnabled()) {
+			log.debug("QMQ Message 对象初始化成功，消息主题：{}", subject);
+		}
 
 		// 遍历装载消息内容
 		for (Map.Entry<String, Object> entry : content.entrySet()) {
@@ -296,21 +300,23 @@ public class QmqTemplate {
 	 * @param message {@link Message} 消息实体
 	 */
 	private void sendMessage(Message message) {
+		if (log.isDebugEnabled()) {
+			log.debug("QMQ 异步消息准备发送，消息主题：{}，消息内容：{}", message.getSubject(), gson.toJson(message));
+		}
+
 		// TODO 需要支持自定义的回调，使用链式调用方法
 		// 发送消息，并返回回调结果
 		producer.sendMessage(message, new MessageSendStateListener() {
-			Gson gson = new Gson();
-
 			@Override
 			public void onSuccess(Message message) {
 				// send success
-				log.info("QMQ 发送异步消息成功，消息主题：{}，消息内容：{}", message.getSubject(), gson.toJson(message));
+				log.info("QMQ 异步消息发送成功，消息主题：{}，消息内容：{}", message.getSubject(), gson.toJson(message));
 			}
 
 			@Override
 			public void onFailed(Message message) {
 				// send failed
-				log.error("QMQ 发送异步消息失败，消息主题：{}，消息内容：{}", message.getSubject(), gson.toJson(message));
+				log.error("QMQ 异步消息发送失败，消息主题：{}，消息内容：{}", message.getSubject(), gson.toJson(message));
 			}
 		});
 	}
