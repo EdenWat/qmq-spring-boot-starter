@@ -26,11 +26,11 @@ public class QmqTemplate {
 	/**
 	 * QMQ 消息发送者
 	 */
-	private MessageProducer producer;
+	private final MessageProducer producer;
 	/**
 	 * QMQ 自动配置属性
 	 */
-	private QmqProperties properties;
+	private final QmqProperties properties;
 
 	/**
 	 * Init QmqTemplate

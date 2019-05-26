@@ -4,13 +4,14 @@ import com.kyexpress.qmq.QmqTemplate;
 import com.kyexpress.qmq.util.QmqUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import qunar.tc.qmq.MessageConsumer;
 import qunar.tc.qmq.MessageProducer;
+import qunar.tc.qmq.consumer.MessageConsumerProvider;
 import qunar.tc.qmq.producer.MessageProducerProvider;
 
 /**
@@ -18,7 +19,7 @@ import qunar.tc.qmq.producer.MessageProducerProvider;
  */
 @Slf4j
 @Configuration
-@ConditionalOnClass(MessageProducer.class)
+@ConditionalOnProperty(prefix = "spring.qmq", value = "enabled", havingValue = "true")
 @EnableConfigurationProperties(QmqProperties.class)
 public class QmqAutoConfigure {
 	/**
@@ -28,10 +29,11 @@ public class QmqAutoConfigure {
 	 */
 	@Bean
 	@ConditionalOnMissingBean(MessageProducer.class)
-	@ConditionalOnProperty(prefix = "spring.qmq", value = "enabled", havingValue = "true")
 	public MessageProducer producer(QmqProperties properties) {
-		MessageProducerProvider producer = new MessageProducerProvider();
+		// 获取消息发送者配置
 		QmqProperties.Producer prop = properties.getProducer();
+
+		MessageProducerProvider producer = new MessageProducerProvider();
 		// appCode
 		producer.setAppCode(properties.getAppCode());
 		// metaServer address
@@ -47,7 +49,7 @@ public class QmqAutoConfigure {
 
 		if (log.isDebugEnabled()) {
 			log.debug(
-					"Init QMQ MessageProducer Success, maxQueueSize: {}, sendThreads: {}, sendBatch: {},  sendTryCount: {}",
+					"Init MessageProducer Success, maxQueueSize: {}, sendThreads: {}, sendBatch: {},  sendTryCount: {}",
 					prop.getMaxQueueSize(), prop.getSendThreads(), prop.getSendBatch(), prop.getSendTryCount());
 		}
 
@@ -65,9 +67,32 @@ public class QmqAutoConfigure {
 	@ConditionalOnBean(MessageProducer.class)
 	public QmqTemplate template(MessageProducer producer, QmqProperties properties) {
 		if (log.isDebugEnabled()) {
-			log.debug("Init QMQ QmqTemplate Success");
+			log.debug("Init QmqTemplate Success");
 		}
 
 		return new QmqTemplate(producer, properties);
+	}
+
+	/**
+	 * Init MessageConsumer
+	 * @param properties {@link QmqProperties}
+	 * @return {@link MessageConsumerProvider}
+	 */
+	@Bean
+	@ConditionalOnMissingBean(MessageConsumer.class)
+	public MessageConsumer consumer(QmqProperties properties) {
+		MessageConsumerProvider consumer = new MessageConsumerProvider();
+		// appCode
+		consumer.setAppCode(properties.getAppCode());
+		// metaServer address
+		consumer.setMetaServer(QmqUtil.defaultMetaServer(properties));
+		// init MessageConsumer
+		consumer.init();
+
+		if (log.isDebugEnabled()) {
+			log.debug("Init MessageConsumer Success");
+		}
+
+		return consumer;
 	}
 }
