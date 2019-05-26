@@ -13,6 +13,7 @@ import qunar.tc.qmq.base.BaseMessage;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -101,6 +102,22 @@ public class QmqTemplate {
 	}
 
 	/**
+	 * 发送延迟消息到指定主题，该方法仅在消息内容只有一个参数时使用
+	 * @param subject 消息主题
+	 * @param key 消息参数键
+	 * @param value 消息参数值
+	 * @param duration 延迟时间间隔
+	 * @param timeUnit 延时时间单位
+	 */
+	public void sendDelay(String subject, String key, Object value, long duration, TimeUnit timeUnit) {
+		// 将键值对转换为 Map
+		Map<String, Object> content = new HashMap<>(1);
+		content.put(key, value);
+
+		sendDelay(subject, content, duration, timeUnit);
+	}
+
+	/**
 	 * 发送延迟消息到指定主题，消息内容使用 Object
 	 * @param subject 消息主题
 	 * @param content 消息内容
@@ -132,6 +149,21 @@ public class QmqTemplate {
 		// 讲延迟时间转换为毫秒
 		long sendTime = System.currentTimeMillis() + timeUnit.toMillis(duration);
 		send(subject, content, new Date(sendTime));
+	}
+
+	/**
+	 * 发送定时消息到指定主题，该方法仅在消息内容只有一个参数时使用
+	 * @param subject 消息主题
+	 * @param key 消息参数键
+	 * @param value 消息参数值
+	 * @param date 消息发送日期，用于延迟或定时发送
+	 */
+	public void sendDelay(String subject, String key, Object value, Date date) {
+		// 将键值对转换为 Map
+		Map<String, Object> content = new HashMap<>(1);
+		content.put(key, value);
+
+		sendDelay(subject, content, date);
 	}
 
 	/**
