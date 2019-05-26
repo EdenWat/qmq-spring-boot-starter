@@ -9,10 +9,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolExecutorFactoryBean;
 import qunar.tc.qmq.MessageConsumer;
 import qunar.tc.qmq.MessageProducer;
 import qunar.tc.qmq.consumer.MessageConsumerProvider;
 import qunar.tc.qmq.producer.MessageProducerProvider;
+
+import java.util.concurrent.Executor;
 
 /**
  * @author kye
@@ -94,5 +97,17 @@ public class QmqAutoConfigure {
 		}
 
 		return consumer;
+	}
+
+	@Bean(name = "qmqExecutor")
+	@ConditionalOnMissingBean(name = "qmqExecutor")
+	@ConditionalOnBean(MessageConsumer.class)
+	public Executor executor(QmqProperties properties) {
+		ThreadPoolExecutorFactoryBean bean = new ThreadPoolExecutorFactoryBean();
+		bean.setCorePoolSize(2);
+		bean.setMaxPoolSize(2);
+		bean.setQueueCapacity(1000);
+		bean.setThreadNamePrefix("qmq-process");
+		return bean.getObject();
 	}
 }
