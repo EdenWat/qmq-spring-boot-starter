@@ -230,6 +230,7 @@ public class QmqTemplate {
 	 * @param date 消息发送日期，用于延迟或定时发送
 	 */
 	private void send(String subject, Map<String, Object> content, Date date) {
+		// TODO 加 Tag
 		// 参数校验
 		Assert.hasText(subject, "QMQ 消息发送主题 Subject 不能为空");
 		Assert.notEmpty(content, "QMQ 消息发送内容 Content 不能为空");
