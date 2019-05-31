@@ -15,8 +15,6 @@ import qunar.tc.qmq.MessageProducer;
 import qunar.tc.qmq.consumer.MessageConsumerProvider;
 import qunar.tc.qmq.producer.MessageProducerProvider;
 
-import java.util.concurrent.Executor;
-
 /**
  * @author kye
  */
@@ -60,23 +58,6 @@ public class QmqAutoConfigure {
 	}
 
 	/**
-	 * Init QmqTemplate
-	 * @param producer {@link MessageProducer}
-	 * @param properties {@link QmqProperties}
-	 * @return {@link QmqTemplate}
-	 */
-	@Bean
-	@ConditionalOnMissingBean(QmqTemplate.class)
-	@ConditionalOnBean(MessageProducer.class)
-	public QmqTemplate template(MessageProducer producer, QmqProperties properties) {
-		if (log.isDebugEnabled()) {
-			log.debug("Init QmqTemplate Success");
-		}
-
-		return new QmqTemplate(producer, properties);
-	}
-
-	/**
 	 * Init MessageConsumer
 	 * @param properties {@link QmqProperties}
 	 * @return {@link MessageConsumerProvider}
@@ -99,15 +80,36 @@ public class QmqAutoConfigure {
 		return consumer;
 	}
 
+	/**
+	 * Init QmqTemplate
+	 * @param producer {@link MessageProducer}
+	 * @param properties {@link QmqProperties}
+	 * @return {@link QmqTemplate}
+	 */
+	@Bean
+	@ConditionalOnMissingBean(QmqTemplate.class)
+	@ConditionalOnBean(MessageProducer.class)
+	public QmqTemplate template(MessageProducer producer, QmqProperties properties) {
+		if (log.isDebugEnabled()) {
+			log.debug("Init QmqTemplate Success");
+		}
+
+		return new QmqTemplate(producer, properties);
+	}
+
 	@Bean(name = "qmqExecutor")
 	@ConditionalOnMissingBean(name = "qmqExecutor")
 	@ConditionalOnBean(MessageConsumer.class)
-	public Executor executor(QmqProperties properties) {
+	public ThreadPoolExecutorFactoryBean executor(QmqProperties properties) {
+		// 获取消息接收者配置
+		QmqProperties.Consumer prop = properties.getConsumer();
+
+		// 设置消费者线程池
 		ThreadPoolExecutorFactoryBean bean = new ThreadPoolExecutorFactoryBean();
 		bean.setCorePoolSize(2);
 		bean.setMaxPoolSize(2);
 		bean.setQueueCapacity(1000);
 		bean.setThreadNamePrefix("qmq-process");
-		return bean.getObject();
+		return bean;
 	}
 }

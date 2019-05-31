@@ -194,7 +194,25 @@ public class QmqProperties {
 	 * QMQ 消息接收者配置
 	 */
 	public static class Consumer {
-		// TODO 消费者待开发
+		/**
+		 *
+		 */
+		private Integer corePoolSize = 1;
+
+		/**
+		 *
+		 */
+		private Integer maxPoolSize = Integer.MAX_VALUE;
+
+		/**
+		 *
+		 */
+		private Integer queueCapacity = Integer.MAX_VALUE;
+
+		/**
+		 *
+		 */
+		private String threadNamePrefix = "qmq-process";
 	}
 
 	/**
