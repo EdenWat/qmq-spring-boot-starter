@@ -1,6 +1,7 @@
 package com.kyexpress.qmq.autoconfigure;
 
 import com.kyexpress.qmq.QmqTemplate;
+import com.kyexpress.qmq.constant.QmqConstant;
 import com.kyexpress.qmq.util.QmqUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -50,7 +51,7 @@ public class QmqAutoConfigure {
 
 		if (log.isDebugEnabled()) {
 			log.debug(
-					"Init MessageProducer Success, maxQueueSize: {}, sendThreads: {}, sendBatch: {},  sendTryCount: {}",
+					"Init MessageProducer Success, maxQueueSize: {}, sendThreads: {}, sendBatch: {}, sendTryCount: {}",
 					prop.getMaxQueueSize(), prop.getSendThreads(), prop.getSendBatch(), prop.getSendTryCount());
 		}
 
@@ -97,8 +98,8 @@ public class QmqAutoConfigure {
 		return new QmqTemplate(producer, properties);
 	}
 
-	@Bean(name = "qmqExecutor")
-	@ConditionalOnMissingBean(name = "qmqExecutor")
+	@Bean(name = QmqConstant.DEFAULT_EXECUTOR_NAME)
+	@ConditionalOnMissingBean(name = QmqConstant.DEFAULT_EXECUTOR_NAME)
 	@ConditionalOnBean(MessageConsumer.class)
 	public ThreadPoolExecutorFactoryBean executor(QmqProperties properties) {
 		// 获取消息接收者配置
@@ -106,10 +107,17 @@ public class QmqAutoConfigure {
 
 		// 设置消费者线程池
 		ThreadPoolExecutorFactoryBean bean = new ThreadPoolExecutorFactoryBean();
-		bean.setCorePoolSize(2);
-		bean.setMaxPoolSize(2);
-		bean.setQueueCapacity(1000);
-		bean.setThreadNamePrefix("qmq-process");
+		bean.setCorePoolSize(prop.getCorePoolSize());
+		bean.setMaxPoolSize(prop.getMaxPoolSize());
+		bean.setQueueCapacity(prop.getQueueCapacity());
+		bean.setThreadNamePrefix(prop.getThreadNamePrefix());
+
+		if (log.isDebugEnabled()) {
+			log.debug(
+					"Init Consumer Executor Success, corePoolSize: {}, maxPoolSize: {}, queueCapacity: {}, threadNamePrefix: {}",
+					prop.getCorePoolSize(), prop.getMaxPoolSize(), prop.getQueueCapacity(), prop.getThreadNamePrefix());
+		}
+
 		return bean;
 	}
 }

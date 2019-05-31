@@ -76,22 +76,27 @@ public final class QmqConstant {
 	public static final long DEFAULT_SEND_TIMEOUT_MILLIS = 5000L;
 
 	/**
-	 * 消息接收者属性：默认县城次
+	 * 消息接收者属性：默认消费线程池名称
+	 */
+	public static final String DEFAULT_EXECUTOR_NAME = "qmqExecutor";
+
+	/**
+	 * 消息接收者属性：默认线程池大小
 	 */
 	public static final int DEFAULT_CORE_POOL_SIZE = 2;
 
 	/**
-	 * 消息接收者属性：
+	 * 消息接收者属性：默认最大线程池大小
 	 */
 	public static final int DEFAULT_MAX_POOL_SIZE = 2;
 
 	/**
-	 * 消息接收者属性：
+	 * 消息接收者属性：默认线程队列大小
 	 */
 	public static final int DEFAULT_QUEUE_CAPACITY = 1000;
 
 	/**
-	 * 消息接收者属性：
+	 * 消息接收者属性：默认线程名称前缀
 	 */
 	public static final String DEFAULT_THREAD_NAME_PREFIX = "qmq-process";
 }

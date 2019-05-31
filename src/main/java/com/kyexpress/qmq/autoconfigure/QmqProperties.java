@@ -195,24 +195,56 @@ public class QmqProperties {
 	 */
 	public static class Consumer {
 		/**
-		 *
+		 * 线程池大小，默认 2
 		 */
-		private Integer corePoolSize = 1;
+		private Integer corePoolSize = QmqConstant.DEFAULT_CORE_POOL_SIZE;
 
 		/**
-		 *
+		 * 最大线程池大小，默认 2
 		 */
-		private Integer maxPoolSize = Integer.MAX_VALUE;
+		private Integer maxPoolSize = QmqConstant.DEFAULT_MAX_POOL_SIZE;
 
 		/**
-		 *
+		 * 线程池队列大小，默认 1000
 		 */
-		private Integer queueCapacity = Integer.MAX_VALUE;
+		private Integer queueCapacity = QmqConstant.DEFAULT_QUEUE_CAPACITY;
 
 		/**
-		 *
+		 * 线程池名称前缀，默认 qmq-process
 		 */
-		private String threadNamePrefix = "qmq-process";
+		private String threadNamePrefix = QmqConstant.DEFAULT_THREAD_NAME_PREFIX;
+
+		public Integer getCorePoolSize() {
+			return corePoolSize != null && corePoolSize > 0 ? corePoolSize : QmqConstant.DEFAULT_CORE_POOL_SIZE;
+		}
+
+		public void setCorePoolSize(Integer corePoolSize) {
+			this.corePoolSize = corePoolSize;
+		}
+
+		public Integer getMaxPoolSize() {
+			return maxPoolSize != null && maxPoolSize > 0 ? maxPoolSize : QmqConstant.DEFAULT_MAX_POOL_SIZE;
+		}
+
+		public void setMaxPoolSize(Integer maxPoolSize) {
+			this.maxPoolSize = maxPoolSize;
+		}
+
+		public Integer getQueueCapacity() {
+			return queueCapacity != null && queueCapacity > 0 ? queueCapacity : QmqConstant.DEFAULT_QUEUE_CAPACITY;
+		}
+
+		public void setQueueCapacity(Integer queueCapacity) {
+			this.queueCapacity = queueCapacity;
+		}
+
+		public String getThreadNamePrefix() {
+			return StringUtils.defaultString(threadNamePrefix, QmqConstant.DEFAULT_THREAD_NAME_PREFIX);
+		}
+
+		public void setThreadNamePrefix(String threadNamePrefix) {
+			this.threadNamePrefix = threadNamePrefix;
+		}
 	}
 
 	/**
