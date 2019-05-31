@@ -34,12 +34,13 @@ public class QmqAutoConfigure {
 	public MessageProducer producer(QmqProperties properties) {
 		// 获取消息发送者配置
 		QmqProperties.Producer prop = properties.getProducer();
+		String metaServer = QmqUtil.defaultMetaServer(properties);
 
 		MessageProducerProvider producer = new MessageProducerProvider();
 		// appCode
 		producer.setAppCode(properties.getAppCode());
 		// metaServer address
-		producer.setMetaServer(QmqUtil.defaultMetaServer(properties));
+		producer.setMetaServer(metaServer);
 		// 异步发送队列大小，默认10000
 		producer.setMaxQueueSize(prop.getMaxQueueSize());
 		// 发送线程数，默认3
@@ -51,8 +52,9 @@ public class QmqAutoConfigure {
 
 		if (log.isDebugEnabled()) {
 			log.debug(
-					"Init MessageProducer Success, maxQueueSize: {}, sendThreads: {}, sendBatch: {}, sendTryCount: {}",
-					prop.getMaxQueueSize(), prop.getSendThreads(), prop.getSendBatch(), prop.getSendTryCount());
+					"Init MessageProducer Success, appCode: {}, metaServer: {}, maxQueueSize: {}, sendThreads: {}, sendBatch: {}, sendTryCount: {}",
+					properties.getAppCode(), metaServer, prop.getMaxQueueSize(), prop.getSendThreads(),
+					prop.getSendBatch(), prop.getSendTryCount());
 		}
 
 		return producer;
@@ -66,16 +68,18 @@ public class QmqAutoConfigure {
 	@Bean
 	@ConditionalOnMissingBean(MessageConsumer.class)
 	public MessageConsumer consumer(QmqProperties properties) {
+		String metaServer = QmqUtil.defaultMetaServer(properties);
+
 		MessageConsumerProvider consumer = new MessageConsumerProvider();
 		// appCode
 		consumer.setAppCode(properties.getAppCode());
 		// metaServer address
-		consumer.setMetaServer(QmqUtil.defaultMetaServer(properties));
+		consumer.setMetaServer(metaServer);
 		// init MessageConsumer
 		consumer.init();
 
 		if (log.isDebugEnabled()) {
-			log.debug("Init MessageConsumer Success");
+			log.debug("Init MessageConsumer Success, appCode: {}, metaServer: {}", properties.getAppCode(), metaServer);
 		}
 
 		return consumer;
@@ -91,8 +95,11 @@ public class QmqAutoConfigure {
 	@ConditionalOnMissingBean(QmqTemplate.class)
 	@ConditionalOnBean(MessageProducer.class)
 	public QmqTemplate template(MessageProducer producer, QmqProperties properties) {
+		// 获取消息发送者模板配置
+		QmqProperties.Template prop = properties.getTemplate();
+
 		if (log.isDebugEnabled()) {
-			log.debug("Init QmqTemplate Success");
+			log.debug("Init QmqTemplate Success, defaultSubject: {}", prop.getDefaultSubject());
 		}
 
 		return new QmqTemplate(producer, properties);
