@@ -124,7 +124,7 @@ public class QmqAutoConfigure {
 	@Bean(QmqConstant.DEFAULT_EXECUTOR_NAME)
 	@ConditionalOnMissingBean(name = QmqConstant.DEFAULT_EXECUTOR_NAME)
 	@ConditionalOnBean(MessageConsumer.class)
-	public Executor executor() {
+	public ThreadPoolExecutorFactoryBean executor() {
 		// 获取消息接收者配置
 		QmqProperties.Consumer prop = properties.getConsumer();
 
@@ -141,6 +141,6 @@ public class QmqAutoConfigure {
 					prop.getCorePoolSize(), prop.getMaxPoolSize(), prop.getQueueCapacity(), prop.getThreadNamePrefix());
 		}
 
-		return bean.getObject();
+		return bean;
 	}
 }
