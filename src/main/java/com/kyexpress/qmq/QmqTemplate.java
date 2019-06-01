@@ -13,7 +13,6 @@ import qunar.tc.qmq.base.BaseMessage;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -30,207 +29,167 @@ public class QmqTemplate {
 	/**
 	 * QMQ 自动配置属性
 	 */
-	private final QmqProperties properties;
+	private final QmqProperties.Template properties;
 
-	/**
-	 * Init QmqTemplate
-	 * @param producer {@link MessageProducer}
-	 * @param properties {@link QmqProperties}
-	 */
-	public QmqTemplate(MessageProducer producer, QmqProperties properties) {
+	public QmqTemplate(MessageProducer producer, QmqProperties.Template properties) {
 		this.producer = producer;
 		this.properties = properties;
 	}
 
 	/**
-	 * 发送延迟消息到默认主题，消息内容使用 Map
-	 * @param content 消息内容
-	 * @param timeUnitEnum 延迟时间枚举
-	 */
-	public void sendDelayDefault(Map<String, Object> content, TimeUnitEnum timeUnitEnum) {
-		sendDelay(properties.getTemplate().getDefaultSubject(), content, timeUnitEnum);
-	}
-
-	/**
-	 * 发送延迟消息到默认主题，消息内容使用 Map
-	 * @param content 消息内容
+	 * 发送延迟消息到默认主题，无标签，消息内容使用 Object
+	 * @param object 消息对象
 	 * @param duration 延迟时间间隔
 	 * @param timeUnit 延时时间单位
 	 * @see com.kyexpress.qmq.constant.QmqConstant#DEFAULT_SUBJECT
 	 */
-	public void sendDelayDefault(Map<String, Object> content, long duration, TimeUnit timeUnit) {
-		sendDelay(properties.getTemplate().getDefaultSubject(), content, duration, timeUnit);
+	public void sendDelayDefault(Object object, long duration, TimeUnit timeUnit) {
+		sendDelay(properties.getDefaultSubject(), object, duration, timeUnit);
 	}
 
 	/**
-	 * 发送定时消息到默认主题，消息内容使用 Map
-	 * @param content 消息内容
-	 * @param date {@link Date} 消息发送日期，用于延迟或定时发送
+	 * 发送定时消息到默认主题，无标签，消息内容使用 Object
+	 * @param object 消息对象
+	 * @param date 消息发送日期，用于延迟或定时发送
 	 * @see com.kyexpress.qmq.constant.QmqConstant#DEFAULT_SUBJECT
 	 */
-	public void sendDelayDefault(Map<String, Object> content, Date date) {
-		sendDelay(properties.getTemplate().getDefaultSubject(), content, date);
+	public void sendScheduleDefault(Object object, Date date) {
+		sendSchedule(properties.getDefaultSubject(), object, date);
 	}
 
 	/**
-	 * 发送即时消息到默认主题，消息内容使用 Map
-	 * @param content 消息内容
+	 * 发送即时消息到默认主题，无标签，消息内容使用 Object
+	 * @param object 消息对象
 	 * @see com.kyexpress.qmq.constant.QmqConstant#DEFAULT_SUBJECT
 	 */
-	public void sendDefault(Map<String, Object> content) {
-		send(properties.getTemplate().getDefaultSubject(), content);
+	public void sendDefault(Object object) {
+		send(properties.getDefaultSubject(), object);
+	}
+
+	/**
+	 * 发送延迟消息到指定主题，无标签，消息内容使用 Object
+	 * @param subject 消息主题
+	 * @param object 消息对象
+	 * @param timeUnitEnum {@link TimeUnitEnum} 时间单位枚举
+	 */
+	public void sendDelay(String subject, Object object, TimeUnitEnum timeUnitEnum) {
+		sendDelay(subject, object, timeUnitEnum.getDuration(), timeUnitEnum.getTimeUnit());
+	}
+
+	/**
+	 * 发送延迟消息到指定主题，无标签，消息内容使用 Object
+	 * @param subject 消息主题
+	 * @param object 消息对象
+	 * @param duration 延迟时间间隔
+	 * @param timeUnit 延时时间单位
+	 */
+	public void sendDelay(String subject, Object object, long duration, TimeUnit timeUnit) {
+		sendDelay(subject, null, object, duration, timeUnit);
 	}
 
 	/**
 	 * 发送延迟消息到指定主题，消息内容使用 Object
 	 * @param subject 消息主题
-	 * @param content 消息内容
-	 * @param timeUnitEnum 延迟时间枚举
+	 * @param tag 消息标签
+	 * @param object 消息对象
+	 * @param duration 延迟时间间隔
+	 * @param timeUnit 延时时间单位
 	 */
-	public void sendDelay(String subject, Object content, TimeUnitEnum timeUnitEnum) {
-		sendDelay(subject, content, timeUnitEnum.getDuration(), timeUnitEnum.getTimeUnit());
+	public void sendDelay(String subject, String tag, Object object, long duration, TimeUnit timeUnit) {
+		sendDelay(subject, tag, QmqUtil.objToMap(object), duration, timeUnit);
 	}
 
 	/**
 	 * 发送延迟消息到指定主题，消息内容使用 Map
 	 * @param subject 消息主题
-	 * @param content 消息内容
-	 * @param timeUnitEnum 延迟时间枚举
-	 */
-	public void sendDelay(String subject, Map<String, Object> content, TimeUnitEnum timeUnitEnum) {
-		sendDelay(subject, content, timeUnitEnum.getDuration(), timeUnitEnum.getTimeUnit());
-	}
-
-	/**
-	 * 发送延迟消息到指定主题，该方法仅在消息内容只有一个参数时使用
-	 * @param subject 消息主题
-	 * @param key 消息参数键
-	 * @param value 消息参数值
-	 * @param duration 延迟时间间隔
-	 * @param timeUnit 延时时间单位
-	 */
-	public void sendDelay(String subject, String key, Object value, long duration, TimeUnit timeUnit) {
-		// 将键值对转换为 Map
-		Map<String, Object> content = new HashMap<>(1);
-		content.put(key, value);
-
-		sendDelay(subject, content, duration, timeUnit);
-	}
-
-	/**
-	 * 发送延迟消息到指定主题，消息内容使用 Object
-	 * @param subject 消息主题
+	 * @param tag 消息标签
 	 * @param content 消息内容
 	 * @param duration 延迟时间间隔
 	 * @param timeUnit 延时时间单位
 	 */
-	public void sendDelay(String subject, Object content, long duration, TimeUnit timeUnit) {
+	public void sendDelay(String subject, String tag, Map<String, Object> content, long duration, TimeUnit timeUnit) {
 		// 判断消息延迟发送时间
 		Assert.isTrue(duration > 0, "消息延迟接收时间不能为过去时");
 		Assert.notNull(timeUnit, "消息延迟接收时间单位不能为空");
-
 		// 讲延迟时间转换为毫秒
 		long sendTime = System.currentTimeMillis() + timeUnit.toMillis(duration);
-		send(subject, content, new Date(sendTime));
+
+		doSend(subject, tag, content, new Date(sendTime));
 	}
 
 	/**
-	 * 发送延迟消息到指定主题，消息内容使用 Map
+	 * 发送定时消息到指定主题，无标签，消息内容使用 Object
 	 * @param subject 消息主题
-	 * @param content 消息内容
-	 * @param duration 延迟时间间隔
-	 * @param timeUnit 延时时间单位
-	 */
-	public void sendDelay(String subject, Map<String, Object> content, long duration, TimeUnit timeUnit) {
-		// 判断消息延迟发送时间
-		Assert.isTrue(duration > 0, "消息延迟接收时间不能为过去时");
-		Assert.notNull(timeUnit, "消息延迟接收时间单位不能为空");
-
-		// 讲延迟时间转换为毫秒
-		long sendTime = System.currentTimeMillis() + timeUnit.toMillis(duration);
-		send(subject, content, new Date(sendTime));
-	}
-
-	/**
-	 * 发送定时消息到指定主题，该方法仅在消息内容只有一个参数时使用
-	 * @param subject 消息主题
-	 * @param key 消息参数键
-	 * @param value 消息参数值
+	 * @param object 消息对象
 	 * @param date 消息发送日期，用于延迟或定时发送
 	 */
-	public void sendDelay(String subject, String key, Object value, Date date) {
-		// 将键值对转换为 Map
-		Map<String, Object> content = new HashMap<>(1);
-		content.put(key, value);
-
-		sendDelay(subject, content, date);
+	public void sendSchedule(String subject, Object object, Date date) {
+		sendSchedule(subject, null, object, date);
 	}
 
 	/**
 	 * 发送定时消息到指定主题，消息内容使用 Object
 	 * @param subject 消息主题
-	 * @param content 消息内容
+	 * @param tag 消息标签
+	 * @param object 消息对象
 	 * @param date 消息发送日期，用于延迟或定时发送
 	 */
-	public void sendDelay(String subject, Object content, Date date) {
-		// 判断消息定时发送时间
-		Assert.notNull(date, "消息定时接收时间不能为空");
-		Assert.isTrue(date.getTime() > System.currentTimeMillis(), "消息定时接收时间不能为过去时");
-
-		send(subject, content, date);
+	public void sendSchedule(String subject, String tag, Object object, Date date) {
+		sendSchedule(subject, tag, QmqUtil.objToMap(object), date);
 	}
 
 	/**
 	 * 发送定时消息到指定主题，消息内容使用 Map
 	 * @param subject 消息主题
+	 * @param tag 消息标签
 	 * @param content 消息内容
 	 * @param date 消息发送日期，用于延迟或定时发送
 	 */
-	public void sendDelay(String subject, Map<String, Object> content, Date date) {
+	public void sendSchedule(String subject, String tag, Map<String, Object> content, Date date) {
 		// 判断消息定时发送时间
 		Assert.notNull(date, "消息定时接收时间不能为空");
 		Assert.isTrue(date.getTime() > System.currentTimeMillis(), "消息定时接收时间不能为过去时");
 
-		send(subject, content, date);
+		doSend(subject, tag, content, date);
+	}
+
+	/**
+	 * 发送即时消息到指定主题，无标签，消息内容使用 Object
+	 * @param subject 消息主题
+	 * @param object 消息对象
+	 */
+	public void send(String subject, Object object) {
+		send(subject, null, object);
 	}
 
 	/**
 	 * 发送即时消息到指定主题，消息内容使用 Object
 	 * @param subject 消息主题
-	 * @param content 消息内容
+	 * @param tag 消息标签
+	 * @param object 消息对象
 	 */
-	public void send(String subject, Object content) {
-		send(subject, content, null);
+	public void send(String subject, String tag, Object object) {
+		send(subject, tag, QmqUtil.objToMap(object));
 	}
 
 	/**
 	 * 发送即时消息到指定主题，消息内容使用 Map
 	 * @param subject 消息主题
+	 * @param tag 消息标签
 	 * @param content 消息内容
 	 */
-	public void send(String subject, Map<String, Object> content) {
-		send(subject, content, null);
-	}
-
-	/**
-	 * 发送消息，消息内容使用 Object
-	 * @param subject 消息主题
-	 * @param content 消息对象
-	 * @param date 消息发送日期，用于延迟或定时发送
-	 */
-	private void send(String subject, Object content, Date date) {
-		// 发送消息，将 Object 转换为 Map
-		send(subject, QmqUtil.objToMap(content), date);
+	public void send(String subject, String tag, Map<String, Object> content) {
+		doSend(subject, tag, content, null);
 	}
 
 	/**
 	 * 发送消息，消息内容使用 Map
 	 * @param subject 消息主题
+	 * @param tag 消息标签
 	 * @param content 消息内容
 	 * @param date 消息发送日期，用于延迟或定时发送
 	 */
-	private void send(String subject, Map<String, Object> content, Date date) {
-		// TODO 加 Tag
+	private void doSend(String subject, String tag, Map<String, Object> content, Date date) {
 		// 参数校验
 		Assert.hasText(subject, "QMQ 消息发送主题 Subject 不能为空");
 		Assert.notEmpty(content, "QMQ 消息发送内容 Content 不能为空");
@@ -240,6 +199,10 @@ public class QmqTemplate {
 		// 装载延迟消息时间
 		if (date != null && date.getTime() > System.currentTimeMillis()) {
 			message.setDelayTime(date);
+		}
+		// 装载消息 Tag 标签
+		if (StringUtils.isNotBlank(tag)) {
+			message.addTag(tag);
 		}
 
 		// 发送消息

@@ -2,6 +2,7 @@ package com.kyexpress.qmq.util;
 
 import com.kyexpress.qmq.autoconfigure.QmqProperties;
 import com.kyexpress.qmq.constant.QmqConstant;
+import com.kyexpress.qmq.constant.RexConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -11,7 +12,6 @@ import org.springframework.util.CollectionUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * QMQ 内部工具类
@@ -34,8 +34,8 @@ public class QmqUtil {
 		String metaServer = properties.getMetaServer();
 
 		// 优先使用 Host:Port
-		if (StringUtils.isNotBlank(host) && Pattern.matches(QmqConstant.IP4_REX, host) && port != null && Pattern
-				.matches(QmqConstant.PORT_REX, port.toString())) {
+		if (StringUtils.isNotBlank(host) && host.matches(RexConstant.IP4_REX) && port != null && port.toString()
+				.matches(RexConstant.PORT_REX)) {
 			// 拼接 MetaServer
 			return String.format(QmqConstant.META_SERVER_TEMP, host, port);
 		}

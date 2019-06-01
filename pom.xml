@@ -36,9 +36,11 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <java.version>1.8</java.version>
+        <!-- dependency versions -->
         <spring-boot.version>2.1.5.RELEASE</spring-boot.version>
-        <qmq.version>1.1.3</qmq.version>
+        <qmq.version>1.1.4</qmq.version>
         <commons-beanutils.version>1.9.3</commons-beanutils.version>
+        <!-- maven pluging versions -->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-source-plugin.version>3.1.0</maven-source-plugin.version>

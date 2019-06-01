@@ -5,6 +5,7 @@ import com.kyexpress.qmq.constant.QmqConstant;
 import com.kyexpress.qmq.util.QmqUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -16,24 +17,36 @@ import qunar.tc.qmq.MessageProducer;
 import qunar.tc.qmq.consumer.MessageConsumerProvider;
 import qunar.tc.qmq.producer.MessageProducerProvider;
 
+import java.util.concurrent.Executor;
+
 /**
  * @author kye
  */
 @Slf4j
 @Configuration
 @ConditionalOnProperty(prefix = "spring.qmq", value = "enabled", havingValue = "true")
+@ConditionalOnClass({QmqTemplate.class})
 @EnableConfigurationProperties(QmqProperties.class)
 public class QmqAutoConfigure {
 	/**
+	 * QMQ 配置属性
+	 */
+	private final QmqProperties properties;
+
+	public QmqAutoConfigure(QmqProperties properties) {
+		this.properties = properties;
+	}
+
+	/**
 	 * Init MessageProducer
-	 * @param properties {@link QmqProperties}
 	 * @return {@link MessageProducerProvider}
 	 */
 	@Bean
 	@ConditionalOnMissingBean(MessageProducer.class)
-	public MessageProducer producer(QmqProperties properties) {
+	public MessageProducer producer() {
 		// 获取消息发送者配置
 		QmqProperties.Producer prop = properties.getProducer();
+		// 获取 metaServer address
 		String metaServer = QmqUtil.defaultMetaServer(properties);
 
 		MessageProducerProvider producer = new MessageProducerProvider();
@@ -61,13 +74,32 @@ public class QmqAutoConfigure {
 	}
 
 	/**
+	 * Init QmqTemplate
+	 * @param producer {@link MessageProducer}
+	 * @return {@link QmqTemplate}
+	 */
+	@Bean
+	@ConditionalOnMissingBean(QmqTemplate.class)
+	@ConditionalOnBean(MessageProducer.class)
+	public QmqTemplate template(MessageProducer producer) {
+		// 获取消息发送者模板配置
+		QmqProperties.Template prop = properties.getTemplate();
+
+		if (log.isDebugEnabled()) {
+			log.debug("Init QmqTemplate Success, defaultSubject: {}", prop.getDefaultSubject());
+		}
+
+		return new QmqTemplate(producer, prop);
+	}
+
+	/**
 	 * Init MessageConsumer
-	 * @param properties {@link QmqProperties}
 	 * @return {@link MessageConsumerProvider}
 	 */
 	@Bean
 	@ConditionalOnMissingBean(MessageConsumer.class)
-	public MessageConsumer consumer(QmqProperties properties) {
+	public MessageConsumer consumer() {
+		// 获取 metaServer address
 		String metaServer = QmqUtil.defaultMetaServer(properties);
 
 		MessageConsumerProvider consumer = new MessageConsumerProvider();
@@ -86,29 +118,13 @@ public class QmqAutoConfigure {
 	}
 
 	/**
-	 * Init QmqTemplate
-	 * @param producer {@link MessageProducer}
-	 * @param properties {@link QmqProperties}
-	 * @return {@link QmqTemplate}
+	 * Init Consumer Executor
+	 * @return {@link Executor}
 	 */
-	@Bean
-	@ConditionalOnMissingBean(QmqTemplate.class)
-	@ConditionalOnBean(MessageProducer.class)
-	public QmqTemplate template(MessageProducer producer, QmqProperties properties) {
-		// 获取消息发送者模板配置
-		QmqProperties.Template prop = properties.getTemplate();
-
-		if (log.isDebugEnabled()) {
-			log.debug("Init QmqTemplate Success, defaultSubject: {}", prop.getDefaultSubject());
-		}
-
-		return new QmqTemplate(producer, properties);
-	}
-
-	@Bean(name = QmqConstant.DEFAULT_EXECUTOR_NAME)
+	@Bean(QmqConstant.DEFAULT_EXECUTOR_NAME)
 	@ConditionalOnMissingBean(name = QmqConstant.DEFAULT_EXECUTOR_NAME)
 	@ConditionalOnBean(MessageConsumer.class)
-	public ThreadPoolExecutorFactoryBean executor(QmqProperties properties) {
+	public Executor executor() {
 		// 获取消息接收者配置
 		QmqProperties.Consumer prop = properties.getConsumer();
 
@@ -121,10 +137,10 @@ public class QmqAutoConfigure {
 
 		if (log.isDebugEnabled()) {
 			log.debug(
-					"Init Consumer Executor Success, corePoolSize: {}, maxPoolSize: {}, queueCapacity: {}, threadNamePrefix: {}",
+					"Init Executor Success, corePoolSize: {}, maxPoolSize: {}, queueCapacity: {}, threadNamePrefix: {}",
 					prop.getCorePoolSize(), prop.getMaxPoolSize(), prop.getQueueCapacity(), prop.getThreadNamePrefix());
 		}
 
-		return bean;
+		return bean.getObject();
 	}
 }

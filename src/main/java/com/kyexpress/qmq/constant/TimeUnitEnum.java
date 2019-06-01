@@ -24,6 +24,10 @@ public enum TimeUnitEnum {
 	 */
 	ONE_MINUTE(1, TimeUnit.MINUTES),
 	/**
+	 * 3 分钟
+	 */
+	THREE_MINUTES(3, TimeUnit.MINUTES),
+	/**
 	 * 5 分钟
 	 */
 	FIVE_MINUTES(5, TimeUnit.MINUTES),
