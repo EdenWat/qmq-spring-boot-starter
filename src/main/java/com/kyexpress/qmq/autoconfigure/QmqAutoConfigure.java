@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,8 +22,7 @@ import java.util.concurrent.Executor;
  */
 @Slf4j
 @Configuration
-@ConditionalOnProperty(prefix = "spring.qmq", value = "enabled", havingValue = "true")
-@ConditionalOnClass({QmqTemplate.class})
+@ConditionalOnClass(QmqTemplate.class)
 @EnableConfigurationProperties(QmqProperties.class)
 public class QmqAutoConfigure {
 	/**

@@ -10,11 +10,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("spring.qmq")
 public class QmqProperties {
 	/**
-	 * 是否开启 QMQ，默认值 false
-	 */
-	private boolean enabled = false;
-
-	/**
 	 * QMQ AppCode，默认值 qmq_default_code
 	 */
 	private String appCode = QmqConstant.DEFAULT_APP_CODE;
@@ -50,14 +45,6 @@ public class QmqProperties {
 	 * @see com.kyexpress.qmq.QmqTemplate
 	 */
 	private final Template template = new Template();
-
-	public boolean isEnabled() {
-		return enabled;
-	}
-
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
 
 	public String getAppCode() {
 		return StringUtils.defaultString(appCode, QmqConstant.DEFAULT_APP_CODE);
