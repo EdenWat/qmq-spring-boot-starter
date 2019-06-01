@@ -50,8 +50,8 @@ public class QmqUtil {
 	 * @return Map
 	 */
 	public static Map<String, Object> objToMap(Object object) {
-		// 参数校验
-		if (object == null) {
+		// 参数校验，Object 不能为 Map
+		if (object == null || object instanceof Map) {
 			return null;
 		}
 
