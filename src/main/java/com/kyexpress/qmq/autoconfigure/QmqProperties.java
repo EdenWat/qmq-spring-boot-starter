@@ -36,15 +36,15 @@ public class QmqProperties {
 	private final Producer producer = new Producer();
 
 	/**
-	 * QMQ 消息接收者配置
-	 */
-	private final Consumer consumer = new Consumer();
-
-	/**
 	 * QMQ 消息发送模板配置
 	 * @see com.kyexpress.qmq.QmqTemplate
 	 */
 	private final Template template = new Template();
+
+	/**
+	 * QMQ 消息接收者配置
+	 */
+	private final Consumer consumer = new Consumer();
 
 	public String getAppCode() {
 		return StringUtils.defaultString(appCode, QmqConstant.DEFAULT_APP_CODE);
@@ -82,12 +82,12 @@ public class QmqProperties {
 		return producer;
 	}
 
-	public Consumer getConsumer() {
-		return consumer;
-	}
-
 	public Template getTemplate() {
 		return template;
+	}
+
+	public Consumer getConsumer() {
+		return consumer;
 	}
 
 	/**
