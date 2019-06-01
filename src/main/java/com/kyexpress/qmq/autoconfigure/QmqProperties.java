@@ -4,9 +4,6 @@ import com.kyexpress.qmq.constant.QmqConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author kye
  */
@@ -37,11 +34,6 @@ public class QmqProperties {
 	 * QMQ MetaServer port，可使用 metaServer 配置替换，优先使用 host:port
 	 */
 	private Integer port;
-
-	/**
-	 * QMQ Subject 列表，key1:value1, key2:value2...
-	 */
-	private Map<String, String> subject = new HashMap<>();
 
 	/**
 	 * QMQ 消息发送者配置
@@ -97,14 +89,6 @@ public class QmqProperties {
 
 	public void setPort(Integer port) {
 		this.port = port;
-	}
-
-	public Map<String, String> getSubject() {
-		return subject;
-	}
-
-	public void setSubject(Map<String, String> subject) {
-		this.subject = subject;
 	}
 
 	public Producer getProducer() {
@@ -249,11 +233,6 @@ public class QmqProperties {
 		 */
 		private String threadNamePrefix = QmqConstant.DEFAULT_THREAD_NAME_PREFIX;
 
-		/**
-		 * 消费组列表，key1:value1,key2:value2...
-		 */
-		private Map<String, String> group = new HashMap<>();
-
 		public Integer getCorePoolSize() {
 			return corePoolSize != null && corePoolSize > 0 ? corePoolSize : QmqConstant.DEFAULT_CORE_POOL_SIZE;
 		}
@@ -284,14 +263,6 @@ public class QmqProperties {
 
 		public void setThreadNamePrefix(String threadNamePrefix) {
 			this.threadNamePrefix = threadNamePrefix;
-		}
-
-		public Map<String, String> getGroup() {
-			return group;
-		}
-
-		public void setGroup(Map<String, String> group) {
-			this.group = group;
 		}
 	}
 }

@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolExecutorFactoryBean;
 import qunar.tc.qmq.MessageConsumer;
 import qunar.tc.qmq.MessageProducer;
-import qunar.tc.qmq.consumer.MessageConsumerProvider;
 import qunar.tc.qmq.producer.MessageProducerProvider;
 
 import java.util.concurrent.Executor;
@@ -90,31 +89,6 @@ public class QmqAutoConfigure {
 		}
 
 		return new QmqTemplate(producer, prop);
-	}
-
-	/**
-	 * Init MessageConsumer
-	 * @return {@link MessageConsumerProvider}
-	 */
-	@Bean
-	@ConditionalOnMissingBean(MessageConsumer.class)
-	public MessageConsumer consumer() {
-		// 获取 metaServer address
-		String metaServer = QmqUtil.defaultMetaServer(properties);
-
-		MessageConsumerProvider consumer = new MessageConsumerProvider();
-		// appCode
-		consumer.setAppCode(properties.getAppCode());
-		// metaServer address
-		consumer.setMetaServer(metaServer);
-		// init MessageConsumer
-		consumer.init();
-
-		if (log.isDebugEnabled()) {
-			log.debug("Init MessageConsumer Success, appCode: {}, metaServer: {}", properties.getAppCode(), metaServer);
-		}
-
-		return consumer;
 	}
 
 	/**

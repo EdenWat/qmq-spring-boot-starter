@@ -37,9 +37,4 @@ public class QmqTests {
 			e.printStackTrace();
 		}
 	}
-
-	@Test
-	public void test() {
-
-	}
 }
