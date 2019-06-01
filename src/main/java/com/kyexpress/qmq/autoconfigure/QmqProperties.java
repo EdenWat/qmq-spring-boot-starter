@@ -10,7 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("spring.qmq")
 public class QmqProperties {
 	/**
-	 * QMQ AppCode，默认值 qmq_default_code
+	 * QMQ AppCode，默认值 default_app_code
 	 */
 	private String appCode = QmqConstant.DEFAULT_APP_CODE;
 
@@ -183,7 +183,7 @@ public class QmqProperties {
 	 */
 	public static class Template {
 		/**
-		 * 默认消息发送主题，默认值 qmq_default_subject
+		 * 默认消息发送主题，默认值 default_subject
 		 */
 		private String defaultSubject = QmqConstant.DEFAULT_SUBJECT;
 
