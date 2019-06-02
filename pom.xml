@@ -150,7 +150,7 @@
                 <artifactId>maven-scm-plugin</artifactId>
                 <version>${maven-scm-plugin.version}</version>
                 <configuration>
-                    <connectionType>connection</connectionType>
+                    <connectionType>developerConnection</connectionType>
                 </configuration>
             </plugin>
             <plugin>
