@@ -3,7 +3,7 @@
 ## Maven 依赖
 ```
 <dependency>
-    <groupId>com.kyexpress.qmq</groupId>
+    <groupId>xin.wjtree.qmq</groupId>
     <artifactId>qmq-spring-boot-starter</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 </dependency>
@@ -15,7 +15,6 @@ spring:
   application:
     name: qmq
   qmq:
-    enabled: true
     host: 127.0.0.1
     port: 8080
     app-code: qmq_local_home
