@@ -26,5 +26,5 @@ spring:
 
 logging:
   level:
-    com.kyexpress.qmq: debug
+    xin.wjtree.qmq: debug
 ```
