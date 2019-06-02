@@ -7,20 +7,21 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
-    <description>Spring Boot Starter for QMQ</description>
+    <description>Spring Boot with QMQ support,help you simplify QMQ config in Spring Boot.</description>
     <url>https://github.com/wjtree/qmq-spring-boot-starter</url>
 
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <comments>A business-friendly OSS license</comments>
         </license>
     </licenses>
 
     <developers>
         <developer>
             <name>WangJian</name>
-            <url>https://www.wjtree.xin/</url>
+            <url>https://github.com/wjtree</url>
             <email>job@wjtree.xin</email>
             <timezone>+8</timezone>
         </developer>
@@ -100,7 +101,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <encoding>UTF-8</encoding>
+                    <encoding>${project.build.sourceEncoding}</encoding>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
@@ -110,7 +111,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
-                    <argLine>-Dfile.encoding=UTF-8</argLine>
+                    <argLine>-Dfile.encoding=${project.build.sourceEncoding}</argLine>
                     <skip>true</skip>
                 </configuration>
             </plugin>
@@ -118,11 +119,14 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>${maven-source-plugin.version}</version>
+                <configuration>
+                    <attach>true</attach>
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>jar-no-fork</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -132,15 +136,33 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>${maven-javadoc-plugin.version}</version>
                 <configuration>
-                    <charset>UTF-8</charset>
-                    <encoding>UTF-8</encoding>
-                    <docencoding>UTF-8</docencoding>
+                    <show>private</show>
+                    <charset>${project.build.sourceEncoding}</charset>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <docencoding>${project.build.sourceEncoding}</docencoding>
                 </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadoc</id>
                         <goals>
                             <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>${maven-gpg-plugin.version}</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -167,31 +189,13 @@
                     </checkModificationExcludes>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>${maven-gpg-plugin.version}</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
     <scm>
-        <connection>scm:git:git://github.com/wjtree/qmq-spring-boot-starter</connection>
-        <developerConnection>scm:git:git://github.com/wjtree/qmq-spring-boot-starter</developerConnection>
-        <tag>HEAD</tag>
-        <url>https://github.com/wjtree/qmq-spring-boot-starter</url>
+        <connection>scm:git:git@github.com:wjtree/qmq-spring-boot-starter.git</connection>
+        <developerConnection>scm:git:git@github.com:wjtree/qmq-spring-boot-starter.git</developerConnection>
+        <url>https://github.com/wjtree/qmq-spring-boot-starter.git</url>
     </scm>
 
     <distributionManagement>
