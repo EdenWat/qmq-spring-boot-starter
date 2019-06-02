@@ -100,6 +100,7 @@ public class QmqAutoConfigure {
 		// 获取消息接收者配置
 		QmqProperties.Consumer prop = properties.getConsumer();
 
+		// TODO 线程池对象名称可配置
 		// TODO 增加线程池监控
 		// 设置消费者线程池
 		ThreadPoolExecutorFactoryBean bean = new ThreadPoolExecutorFactoryBean();
