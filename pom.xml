@@ -10,23 +10,6 @@
     <description>Spring Boot with QMQ support,help you simplify QMQ config in Spring Boot.</description>
     <url>https://github.com/wjtree/qmq-spring-boot-starter</url>
 
-    <licenses>
-        <license>
-            <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-            <comments>A business-friendly OSS license</comments>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <name>WangJian</name>
-            <url>https://github.com/wjtree</url>
-            <email>job@wjtree.xin</email>
-            <timezone>+8</timezone>
-        </developer>
-    </developers>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -191,6 +174,23 @@
             </plugin>
         </plugins>
     </build>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>WangJian</name>
+            <url>https://github.com/wjtree</url>
+            <email>job@wjtree.xin</email>
+            <timezone>+8</timezone>
+        </developer>
+    </developers>
 
     <scm>
         <connection>scm:git:git@github.com:wjtree/qmq-spring-boot-starter.git</connection>
