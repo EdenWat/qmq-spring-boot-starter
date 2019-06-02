@@ -4,8 +4,8 @@ import com.kyexpress.qmq.autoconfigure.QmqProperties;
 import com.kyexpress.qmq.constant.TimeUnitEnum;
 import com.kyexpress.qmq.util.QmqUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import qunar.tc.qmq.Message;
 import qunar.tc.qmq.MessageProducer;
 import qunar.tc.qmq.MessageSendStateListener;
@@ -201,7 +201,7 @@ public class QmqTemplate {
 			message.setDelayTime(date);
 		}
 		// 装载消息 Tag 标签
-		if (StringUtils.isNotBlank(tag)) {
+		if (StringUtils.hasText(tag)) {
 			message.addTag(tag);
 		}
 
@@ -223,7 +223,7 @@ public class QmqTemplate {
 		// 遍历装载消息内容
 		for (Map.Entry<String, Object> entry : content.entrySet()) {
 			// 键值对校验
-			if (StringUtils.isBlank(entry.getKey()) || entry.getValue() == null) {
+			if (StringUtils.isEmpty(entry.getKey()) || entry.getValue() == null) {
 				log.warn("QMQ 消息内容的键值对为空，key：{}，value：{}", entry.getKey(), entry.getValue());
 				continue;
 			}

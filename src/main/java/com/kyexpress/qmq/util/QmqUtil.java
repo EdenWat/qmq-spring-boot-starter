@@ -5,9 +5,9 @@ import com.kyexpress.qmq.constant.QmqConstant;
 import com.kyexpress.qmq.constant.RexConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
@@ -34,14 +34,14 @@ public class QmqUtil {
 		String metaServer = properties.getMetaServer();
 
 		// 优先使用 Host:Port
-		if (StringUtils.isNotBlank(host) && host.matches(RexConstant.IP4_REX) && port != null && port.toString()
+		if (StringUtils.hasText(host) && host.matches(RexConstant.IP4_REX) && port != null && port.toString()
 				.matches(RexConstant.PORT_REX)) {
 			// 拼接 MetaServer
 			return String.format(QmqConstant.META_SERVER_TEMP, host, port);
 		}
 
 		// Host:Port 为空时，使用 MetaServer；如果 MetaServer 也为空，则返回默认的 MetaServer
-		return StringUtils.isNotBlank(metaServer) ? metaServer : QmqConstant.DEFAULT_META_SERVER;
+		return StringUtils.hasText(metaServer) ? metaServer : QmqConstant.DEFAULT_META_SERVER;
 	}
 
 	/**
@@ -88,7 +88,7 @@ public class QmqUtil {
 	 */
 	public static boolean greaterThan32K(String str, Charset charset) {
 		// 字符串为空，直接返回 false，即使用 Message.setProperty(key, value)
-		if (StringUtils.isBlank(str)) {
+		if (StringUtils.isEmpty(str)) {
 			return false;
 		}
 

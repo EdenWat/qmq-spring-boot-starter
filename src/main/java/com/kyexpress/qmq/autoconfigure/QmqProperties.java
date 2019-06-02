@@ -1,8 +1,8 @@
 package com.kyexpress.qmq.autoconfigure;
 
 import com.kyexpress.qmq.constant.QmqConstant;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.StringUtils;
 
 /**
  * @author kye
@@ -47,7 +47,7 @@ public class QmqProperties {
 	private final Consumer consumer = new Consumer();
 
 	public String getAppCode() {
-		return StringUtils.defaultString(appCode, QmqConstant.DEFAULT_APP_CODE);
+		return StringUtils.hasText(appCode) ? appCode : QmqConstant.DEFAULT_APP_CODE;
 	}
 
 	public void setAppCode(String appCode) {
@@ -55,7 +55,7 @@ public class QmqProperties {
 	}
 
 	public String getMetaServer() {
-		return StringUtils.defaultString(metaServer, QmqConstant.DEFAULT_META_SERVER);
+		return StringUtils.hasText(metaServer) ? metaServer : QmqConstant.DEFAULT_META_SERVER;
 	}
 
 	public void setMetaServer(String metaServer) {
@@ -188,7 +188,7 @@ public class QmqProperties {
 		private String defaultSubject = QmqConstant.DEFAULT_SUBJECT;
 
 		public String getDefaultSubject() {
-			return StringUtils.defaultString(defaultSubject, QmqConstant.DEFAULT_SUBJECT);
+			return StringUtils.hasText(defaultSubject) ? defaultSubject : QmqConstant.DEFAULT_SUBJECT;
 		}
 
 		public void setDefaultSubject(String defaultSubject) {
@@ -245,7 +245,7 @@ public class QmqProperties {
 		}
 
 		public String getThreadNamePrefix() {
-			return StringUtils.defaultString(threadNamePrefix, QmqConstant.DEFAULT_THREAD_NAME_PREFIX);
+			return StringUtils.hasText(threadNamePrefix) ? threadNamePrefix : QmqConstant.DEFAULT_THREAD_NAME_PREFIX;
 		}
 
 		public void setThreadNamePrefix(String threadNamePrefix) {
