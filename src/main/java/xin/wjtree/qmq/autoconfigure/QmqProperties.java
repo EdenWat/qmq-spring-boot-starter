@@ -1,6 +1,7 @@
-package com.kyexpress.qmq.autoconfigure;
+package xin.wjtree.qmq.autoconfigure;
 
-import com.kyexpress.qmq.constant.QmqConstant;
+import xin.wjtree.qmq.QmqTemplate;
+import xin.wjtree.qmq.constant.QmqConstant;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
 
@@ -37,7 +38,7 @@ public class QmqProperties {
 
 	/**
 	 * QMQ 消息发送模板配置
-	 * @see com.kyexpress.qmq.QmqTemplate
+	 * @see QmqTemplate
 	 */
 	private final Template template = new Template();
 
@@ -179,7 +180,7 @@ public class QmqProperties {
 
 	/**
 	 * QMQ 消息发送模板配置
-	 * @see com.kyexpress.qmq.QmqTemplate
+	 * @see QmqTemplate
 	 */
 	public static class Template {
 		/**

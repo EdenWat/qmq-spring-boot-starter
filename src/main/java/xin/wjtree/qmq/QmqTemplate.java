@@ -1,8 +1,9 @@
-package com.kyexpress.qmq;
+package xin.wjtree.qmq;
 
-import com.kyexpress.qmq.autoconfigure.QmqProperties;
-import com.kyexpress.qmq.constant.TimeUnitEnum;
-import com.kyexpress.qmq.util.QmqUtil;
+import xin.wjtree.qmq.constant.QmqConstant;
+import xin.wjtree.qmq.util.QmqUtil;
+import xin.wjtree.qmq.autoconfigure.QmqProperties;
+import xin.wjtree.qmq.constant.TimeUnitEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -41,7 +42,7 @@ public class QmqTemplate {
 	 * @param object 消息对象
 	 * @param duration 延迟时间间隔
 	 * @param timeUnit 延时时间单位
-	 * @see com.kyexpress.qmq.constant.QmqConstant#DEFAULT_SUBJECT
+	 * @see QmqConstant#DEFAULT_SUBJECT
 	 */
 	public void sendDelayDefault(Object object, long duration, TimeUnit timeUnit) {
 		sendDelay(properties.getDefaultSubject(), object, duration, timeUnit);
@@ -51,7 +52,7 @@ public class QmqTemplate {
 	 * 发送定时消息到默认主题，无标签，消息内容使用 Object
 	 * @param object 消息对象
 	 * @param date 消息发送日期，用于延迟或定时发送
-	 * @see com.kyexpress.qmq.constant.QmqConstant#DEFAULT_SUBJECT
+	 * @see QmqConstant#DEFAULT_SUBJECT
 	 */
 	public void sendScheduleDefault(Object object, Date date) {
 		sendSchedule(properties.getDefaultSubject(), object, date);
@@ -60,7 +61,7 @@ public class QmqTemplate {
 	/**
 	 * 发送即时消息到默认主题，无标签，消息内容使用 Object
 	 * @param object 消息对象
-	 * @see com.kyexpress.qmq.constant.QmqConstant#DEFAULT_SUBJECT
+	 * @see QmqConstant#DEFAULT_SUBJECT
 	 */
 	public void sendDefault(Object object) {
 		send(properties.getDefaultSubject(), object);

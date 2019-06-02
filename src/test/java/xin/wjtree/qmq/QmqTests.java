@@ -1,4 +1,4 @@
-package com.kyexpress.qmq;
+package xin.wjtree.qmq;
 
 import org.junit.Test;
 import qunar.tc.qmq.Message;

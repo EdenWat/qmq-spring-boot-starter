@@ -1,8 +1,8 @@
-package com.kyexpress.qmq.autoconfigure;
+package xin.wjtree.qmq.autoconfigure;
 
-import com.kyexpress.qmq.QmqTemplate;
-import com.kyexpress.qmq.constant.QmqConstant;
-import com.kyexpress.qmq.util.QmqUtil;
+import xin.wjtree.qmq.QmqTemplate;
+import xin.wjtree.qmq.constant.QmqConstant;
+import xin.wjtree.qmq.util.QmqUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;

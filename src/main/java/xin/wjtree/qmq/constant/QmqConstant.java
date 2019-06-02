@@ -1,4 +1,4 @@
-package com.kyexpress.qmq.constant;
+package xin.wjtree.qmq.constant;
 
 /**
  * QMQ 常量

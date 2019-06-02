@@ -1,8 +1,8 @@
-package com.kyexpress.qmq.util;
+package xin.wjtree.qmq.util;
 
-import com.kyexpress.qmq.autoconfigure.QmqProperties;
-import com.kyexpress.qmq.constant.QmqConstant;
-import com.kyexpress.qmq.constant.RexConstant;
+import xin.wjtree.qmq.constant.RexConstant;
+import xin.wjtree.qmq.autoconfigure.QmqProperties;
+import xin.wjtree.qmq.constant.QmqConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.util.Assert;

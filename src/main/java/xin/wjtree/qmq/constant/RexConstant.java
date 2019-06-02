@@ -1,4 +1,4 @@
-package com.kyexpress.qmq.constant;
+package xin.wjtree.qmq.constant;
 
 /**
  * 正则表达式-匹配格式
