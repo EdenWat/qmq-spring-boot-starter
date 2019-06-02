@@ -50,12 +50,13 @@ public class QmqUtil {
 	 * @return Map
 	 */
 	public static Map<String, Object> objToMap(Object object) {
-		// 参数校验，Object 不能为 Map
-		if (object == null || object instanceof Map) {
+		// 参数校验，Object 不能是基础数据类型或 Map
+		if (object == null || object.getClass().isPrimitive() || object instanceof Map) {
 			return null;
 		}
 
-		// TODO 需要支持嵌套 Object 转换到同一个 Map
+		// TODO 需要支持嵌套 Object 转换到同一个 Map，并移除 Apache-BeanUtils
+		// TODO 增加注解，标识实体类属性，使用注解的属性会被发送，否则所有实体类非空属性都会发送
 		Map<String, Object> describe = null;
 
 		try {
