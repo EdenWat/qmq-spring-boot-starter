@@ -159,6 +159,7 @@
                 <version>${maven-release-plugin.version}</version>
                 <configuration>
                     <tagNameFormat>v@{project.version}.RELEASE</tagNameFormat>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
                     <checkModificationExcludes>
                         <checkModificationExclude>.project</checkModificationExclude>
                         <checkModificationExclude>.classpath</checkModificationExclude>
