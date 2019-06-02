@@ -1,16 +1,16 @@
 package xin.wjtree.qmq;
 
-import xin.wjtree.qmq.constant.QmqConstant;
-import xin.wjtree.qmq.util.QmqUtil;
-import xin.wjtree.qmq.autoconfigure.QmqProperties;
-import xin.wjtree.qmq.constant.TimeUnitEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-import qunar.tc.qmq.Message;
 import qunar.tc.qmq.MessageProducer;
 import qunar.tc.qmq.MessageSendStateListener;
 import qunar.tc.qmq.base.BaseMessage;
+import xin.wjtree.qmq.autoconfigure.QmqProperties;
+import xin.wjtree.qmq.constant.QmqConstant;
+import xin.wjtree.qmq.constant.TimeUnitEnum;
+import xin.wjtree.qmq.internal.DefaultMessageSendStateListener;
+import xin.wjtree.qmq.internal.QmqUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -32,9 +32,24 @@ public class QmqTemplate {
 	 */
 	private final QmqProperties.Template properties;
 
+	/**
+	 * QMQ 消息发送状态监听器，默认的回调方法仅打印发送结果日志
+	 */
+	private MessageSendStateListener listener = new DefaultMessageSendStateListener();
+
 	public QmqTemplate(MessageProducer producer, QmqProperties.Template properties) {
 		this.producer = producer;
 		this.properties = properties;
+	}
+
+	/**
+	 * 设置自定义的消息发送状态监听器，使用链式调用方法
+	 * @param listener 消息发送状态监听器
+	 * @return {@link QmqTemplate}
+	 */
+	public QmqTemplate buildListener(MessageSendStateListener listener) {
+		this.listener = listener;
+		return this;
 	}
 
 	/**
@@ -115,7 +130,7 @@ public class QmqTemplate {
 		// 讲延迟时间转换为毫秒
 		long sendTime = System.currentTimeMillis() + timeUnit.toMillis(duration);
 
-		doSend(subject, tag, content, new Date(sendTime));
+		sendMessage(subject, tag, content, new Date(sendTime));
 	}
 
 	/**
@@ -151,7 +166,7 @@ public class QmqTemplate {
 		Assert.notNull(date, "消息定时接收时间不能为空");
 		Assert.isTrue(date.getTime() > System.currentTimeMillis(), "消息定时接收时间不能为过去时");
 
-		doSend(subject, tag, content, date);
+		sendMessage(subject, tag, content, date);
 	}
 
 	/**
@@ -180,17 +195,20 @@ public class QmqTemplate {
 	 * @param content 消息内容
 	 */
 	public void send(String subject, String tag, Map<String, Object> content) {
-		doSend(subject, tag, content, null);
+		sendMessage(subject, tag, content, null);
 	}
 
 	/**
-	 * 发送消息，消息内容使用 Map
+	 * 异步发送消息，支持回调方法，消息内容使用 Map
+	 * <ul>
+	 *     <li>QMQ 暂时不支持同步发送消息，如果需要同步发送，要通过修改源代码实现</li>
+	 * </ul>
 	 * @param subject 消息主题
 	 * @param tag 消息标签
 	 * @param content 消息内容
 	 * @param date 消息发送日期，用于延迟或定时发送
 	 */
-	private void doSend(String subject, String tag, Map<String, Object> content, Date date) {
+	private void sendMessage(String subject, String tag, Map<String, Object> content, Date date) {
 		// 参数校验
 		Assert.hasText(subject, "QMQ 消息发送主题 Subject 不能为空");
 		Assert.notEmpty(content, "QMQ 消息发送内容 Content 不能为空");
@@ -206,8 +224,11 @@ public class QmqTemplate {
 			message.addTag(tag);
 		}
 
-		// 发送消息
-		sendMessage(message);
+		if (log.isDebugEnabled()) {
+			log.debug("QMQ 异步消息准备发送，消息主题：{}，消息内容：{}", message.getSubject(), message.getAttrs());
+		}
+		// 发送消息，并返回回调结果
+		producer.sendMessage(message, listener);
 	}
 
 	/**
@@ -222,15 +243,7 @@ public class QmqTemplate {
 		Assert.notNull(message, "QMQ 消息发送对象 BaseMessage 不能为空");
 
 		// 遍历装载消息内容
-		for (Map.Entry<String, Object> entry : content.entrySet()) {
-			// 键值对校验
-			if (StringUtils.isEmpty(entry.getKey()) || entry.getValue() == null) {
-				log.warn("QMQ 消息内容的键值对为空，key：{}，value：{}", entry.getKey(), entry.getValue());
-				continue;
-			}
-			// 根据数据类型，选择 set 方法
-			bindMessage(message, entry);
-		}
+		content.entrySet().forEach(entry -> bindMessage(message, entry));
 
 		return message;
 	}
@@ -251,6 +264,12 @@ public class QmqTemplate {
 	 * @param entry 单条消息键值对
 	 */
 	private void bindMessage(BaseMessage message, Map.Entry<String, Object> entry) {
+		// 键值对校验
+		if (StringUtils.isEmpty(entry.getKey()) || entry.getValue() == null) {
+			log.warn("QMQ 消息内容的键值对为空，key：{}，value：{}", entry.getKey(), entry.getValue());
+			return;
+		}
+
 		// 声明消息内容的键值对
 		String key = entry.getKey();
 		Object value = entry.getValue();
@@ -279,35 +298,5 @@ public class QmqTemplate {
 		} else {
 			throw new IllegalStateException("Unexpected value: " + value.getClass());
 		}
-	}
-
-	/**
-	 * 异步发送消息，支持回调方法
-	 * <ul>
-	 *     <li>默认的毁掉方法仅打印发送结果日志</li>
-	 *     <li>QMQ 暂时不支持同步发送消息，如果需要同步发送，要通过修改源代码实现</li>
-	 * </ul>
-	 * @param message {@link BaseMessage} 消息实体
-	 */
-	private void sendMessage(BaseMessage message) {
-		if (log.isDebugEnabled()) {
-			log.debug("QMQ 异步消息准备发送，消息主题：{}，消息内容：{}", message.getSubject(), message.getAttrs());
-		}
-
-		// TODO 需要支持自定义的回调，使用链式调用方法
-		// 发送消息，并返回回调结果
-		producer.sendMessage(message, new MessageSendStateListener() {
-			@Override
-			public void onSuccess(Message message) {
-				// send success
-				log.info("QMQ 异步消息发送成功，消息主题：{}，消息内容：{}", message.getSubject(), ((BaseMessage) message).getAttrs());
-			}
-
-			@Override
-			public void onFailed(Message message) {
-				// send failed
-				log.error("QMQ 异步消息发送失败，消息主题：{}，消息内容：{}", message.getSubject(), ((BaseMessage) message).getAttrs());
-			}
-		});
 	}
 }

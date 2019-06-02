@@ -2,7 +2,7 @@ package xin.wjtree.qmq.autoconfigure;
 
 import xin.wjtree.qmq.QmqTemplate;
 import xin.wjtree.qmq.constant.QmqConstant;
-import xin.wjtree.qmq.util.QmqUtil;
+import xin.wjtree.qmq.internal.QmqUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -100,6 +100,7 @@ public class QmqAutoConfigure {
 		// 获取消息接收者配置
 		QmqProperties.Consumer prop = properties.getConsumer();
 
+		// TODO 增加线程池监控
 		// 设置消费者线程池
 		ThreadPoolExecutorFactoryBean bean = new ThreadPoolExecutorFactoryBean();
 		bean.setCorePoolSize(prop.getCorePoolSize());

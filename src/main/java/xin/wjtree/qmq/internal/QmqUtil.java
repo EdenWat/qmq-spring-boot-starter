@@ -1,13 +1,14 @@
-package xin.wjtree.qmq.util;
+package xin.wjtree.qmq.internal;
 
-import xin.wjtree.qmq.constant.RexConstant;
-import xin.wjtree.qmq.autoconfigure.QmqProperties;
-import xin.wjtree.qmq.constant.QmqConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import xin.wjtree.qmq.autoconfigure.QmqProperties;
+import xin.wjtree.qmq.constant.QmqConstant;
+import xin.wjtree.qmq.constant.RexConstant;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
@@ -51,8 +52,11 @@ public class QmqUtil {
 	 */
 	public static Map<String, Object> objToMap(Object object) {
 		// 参数校验，Object 不能是基础数据类型或 Map
-		if (object == null || object.getClass().isPrimitive() || object instanceof Map) {
-			return null;
+		if (ObjectUtils.isEmpty(object)) {
+			throw new QmqException("QMQ 消息对象 Object 不能为空");
+		}
+		if (object.getClass().isPrimitive() || object instanceof Map) {
+			throw new QmqException("QMQ 消息对象 Object 不能是基本数据类型或 Map 类型");
 		}
 
 		// TODO 需要支持嵌套 Object 转换到同一个 Map，并移除 Apache-BeanUtils
