@@ -156,6 +156,8 @@
                 <version>${maven-scm-plugin.version}</version>
                 <configuration>
                     <connectionType>developerConnection</connectionType>
+                    <branch>${project.version}</branch>
+                    <tag>${project.version}</tag>
                 </configuration>
             </plugin>
             <plugin>
