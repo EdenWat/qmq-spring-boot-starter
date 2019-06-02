@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.kyexpress.qmq</groupId>
     <artifactId>qmq-spring-boot-starter</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
     <description>Spring Boot with QMQ support,help you simplify QMQ config in Spring Boot.</description>
@@ -197,7 +197,7 @@
         <connection>scm:git:git@github.com:wjtree/qmq-spring-boot-starter.git</connection>
         <developerConnection>scm:git:git@github.com:wjtree/qmq-spring-boot-starter.git</developerConnection>
         <url>https://github.com/wjtree/qmq-spring-boot-starter.git</url>
-      <tag>v1.0.0.RELEASE</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <distributionManagement>
