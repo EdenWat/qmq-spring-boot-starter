@@ -60,7 +60,7 @@ public class QmqUtil {
 		}
 
 		// TODO 需要支持嵌套 Object 转换到同一个 Map，并移除 Apache-BeanUtils
-		// TODO 增加注解，标识实体类属性，使用注解的属性会被发送，否则所有实体类非空属性都会发送
+		// TODO 增加注解，设置注解属性为别名，标记注解别名的，发送消息时 key 会使用别名而不是字段名
 		Map<String, Object> describe = null;
 
 		try {
