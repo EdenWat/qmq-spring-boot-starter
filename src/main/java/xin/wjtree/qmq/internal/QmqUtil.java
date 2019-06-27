@@ -59,7 +59,6 @@ public class QmqUtil {
 			throw new QmqException("QMQ 消息对象 Object 不能是基本数据类型或 Map 类型");
 		}
 
-		// TODO 需要支持嵌套 Object 转换到同一个 Map，并移除 Apache-BeanUtils
 		// TODO 增加注解，设置注解属性为别名，标记注解别名的，发送消息时 key 会使用别名而不是字段名
 		Map<String, Object> describe = null;
 
