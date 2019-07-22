@@ -2,13 +2,9 @@ package xin.wjtree.qmq.internal;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import xin.wjtree.qmq.autoconfigure.QmqProperties;
-import xin.wjtree.qmq.constant.QmqConstant;
-import xin.wjtree.qmq.constant.RexConstant;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
@@ -20,31 +16,6 @@ import java.util.Map;
  */
 @Slf4j
 public class QmqUtil {
-	/**
-	 * 组装 QMQ MetaServer，如果属性为空，则返回默认值
-	 * @param properties QMQ 配置文件
-	 * @return metaServer
-	 * @see QmqConstant#DEFAULT_META_SERVER
-	 */
-	public static String defaultMetaServer(QmqProperties properties) {
-		Assert.notNull(properties, "QMQ 属性配置文件 QmqProperties 不能为空");
-
-		// Host:Port or MetaServer
-		String host = properties.getHost();
-		Integer port = properties.getPort();
-		String metaServer = properties.getMetaServer();
-
-		// 优先使用 Host:Port
-		if (StringUtils.hasText(host) && host.matches(RexConstant.IP4_REX) && port != null && port.toString()
-				.matches(RexConstant.PORT_REX)) {
-			// 拼接 MetaServer
-			return String.format(QmqConstant.META_SERVER_TEMP, host, port);
-		}
-
-		// Host:Port 为空时，使用 MetaServer；如果 MetaServer 也为空，则返回默认的 MetaServer
-		return StringUtils.hasText(metaServer) ? metaServer : QmqConstant.DEFAULT_META_SERVER;
-	}
-
 	/**
 	 * 将 Object 转换为 Map
 	 * @param object 消息对象

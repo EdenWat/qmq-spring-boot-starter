@@ -22,16 +22,6 @@ public class QmqProperties {
 	private String metaServer = QmqConstant.DEFAULT_META_SERVER;
 
 	/**
-	 * QMQ MetaServer host，可使用 metaServer 配置替换，优先使用 host:port
-	 */
-	private String host;
-
-	/**
-	 * QMQ MetaServer port，可使用 metaServer 配置替换，优先使用 host:port
-	 */
-	private Integer port;
-
-	/**
 	 * QMQ 消息发送者配置
 	 */
 	private final Producer producer = new Producer();
@@ -61,22 +51,6 @@ public class QmqProperties {
 
 	public void setMetaServer(String metaServer) {
 		this.metaServer = metaServer;
-	}
-
-	public String getHost() {
-		return host;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	public Integer getPort() {
-		return port;
-	}
-
-	public void setPort(Integer port) {
-		this.port = port;
 	}
 
 	public Producer getProducer() {
@@ -217,9 +191,14 @@ public class QmqProperties {
 		private Integer queueCapacity = QmqConstant.DEFAULT_QUEUE_CAPACITY;
 
 		/**
-		 * 线程池名称前缀，默认 qmq-process
+		 * 线程名称前缀，默认 qmq-process
 		 */
 		private String threadNamePrefix = QmqConstant.DEFAULT_THREAD_NAME_PREFIX;
+
+		/**
+		 * 线程池名称，默认 qmqExecutor
+		 */
+		private String executorName = QmqConstant.DEFAULT_EXECUTOR_NAME;
 
 		public Integer getCorePoolSize() {
 			return corePoolSize != null && corePoolSize > 0 ? corePoolSize : QmqConstant.DEFAULT_CORE_POOL_SIZE;
@@ -251,6 +230,14 @@ public class QmqProperties {
 
 		public void setThreadNamePrefix(String threadNamePrefix) {
 			this.threadNamePrefix = threadNamePrefix;
+		}
+
+		public String getExecutorName() {
+			return StringUtils.hasText(executorName) ? executorName : QmqConstant.DEFAULT_EXECUTOR_NAME;
+		}
+
+		public void setExecutorName(String executorName) {
+			this.executorName = executorName;
 		}
 	}
 }
