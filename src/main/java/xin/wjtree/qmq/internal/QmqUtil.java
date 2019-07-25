@@ -50,6 +50,12 @@ public class QmqUtil {
 		return describe;
 	}
 
+	public static Map<String, Object> objToMap2(Object object) {
+		Class<?> aClass = object.getClass();
+
+		return null;
+	}
+
 	/**
 	 * 比较字符串大小是否超过32K
 	 * <ul>
@@ -61,12 +67,11 @@ public class QmqUtil {
 	 * @param charset 字符编码
 	 * @return true or false
 	 */
-	public static boolean greaterThan32K(String str, Charset charset) {
+	public static boolean isLargeString(String str, Charset charset) {
 		// 字符串为空，直接返回 false，即使用 Message.setProperty(key, value)
 		if (StringUtils.isEmpty(str)) {
 			return false;
 		}
-
 		// 使用指定编码，计算出字节数
 		// 将 32k 转换为字节，1 KB = 1024 bytes
 		return str.getBytes(charset).length >= 32 * 1024;

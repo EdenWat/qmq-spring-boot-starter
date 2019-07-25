@@ -47,7 +47,7 @@ public class QmqTemplate {
 	 * @param listener 消息发送状态监听器
 	 * @return {@link QmqTemplate}
 	 */
-	public QmqTemplate buildListener(MessageSendStateListener listener) {
+	public QmqTemplate withSendStateListener(MessageSendStateListener listener) {
 		this.listener = listener;
 		return this;
 	}
@@ -290,7 +290,7 @@ public class QmqTemplate {
 		} else if (value instanceof String) {
 			String str = (String) value;
 			// 判断字符串大小是否超过32K，使用 UTF-8 编码
-			if (QmqUtil.greaterThan32K(str, StandardCharsets.UTF_8)) {
+			if (QmqUtil.isLargeString(str, StandardCharsets.UTF_8)) {
 				message.setLargeString(key, str);
 			} else {
 				message.setProperty(key, str);
