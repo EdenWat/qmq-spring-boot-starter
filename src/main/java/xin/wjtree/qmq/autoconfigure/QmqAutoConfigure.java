@@ -63,7 +63,7 @@ public class QmqAutoConfigure {
 	}
 
 	@Bean(destroyMethod = "shutdown")
-	@ConditionalOnMissingBean(name = {"${spring.qmq.executor-name}"})
+	@ConditionalOnMissingBean(name = "${spring.qmq.executor-name:qmqExecutor}")
 	@ConditionalOnBean(MessageConsumer.class)
 	public ThreadPoolExecutorFactoryBean qmqExecutor(QmqProperties properties) {
 		// 获取消息接收者配置
