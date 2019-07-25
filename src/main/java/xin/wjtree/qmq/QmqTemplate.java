@@ -8,7 +8,7 @@ import qunar.tc.qmq.MessageSendStateListener;
 import qunar.tc.qmq.base.BaseMessage;
 import xin.wjtree.qmq.autoconfigure.QmqProperties;
 import xin.wjtree.qmq.constant.QmqConstant;
-import xin.wjtree.qmq.constant.TimeUnitEnum;
+import xin.wjtree.qmq.constant.QmqUnit;
 import xin.wjtree.qmq.internal.DefaultMessageSendStateListener;
 import xin.wjtree.qmq.internal.QmqUtil;
 
@@ -86,10 +86,10 @@ public class QmqTemplate {
 	 * 发送延迟消息到指定主题，无标签，消息内容使用 Object
 	 * @param subject 消息主题
 	 * @param object 消息对象
-	 * @param timeUnitEnum {@link TimeUnitEnum} 时间单位枚举
+	 * @param qmqUnit {@link QmqUnit} 时间单位枚举
 	 */
-	public void sendDelay(String subject, Object object, TimeUnitEnum timeUnitEnum) {
-		sendDelay(subject, object, timeUnitEnum.getDuration(), timeUnitEnum.getTimeUnit());
+	public void sendDelay(String subject, Object object, QmqUnit qmqUnit) {
+		sendDelay(subject, object, qmqUnit.getDuration(), qmqUnit.getTimeUnit());
 	}
 
 	/**

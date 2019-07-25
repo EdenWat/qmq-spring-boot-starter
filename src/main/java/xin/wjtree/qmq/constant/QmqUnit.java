@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
  * 单位时间枚举
  * @author Wang
  */
-public enum TimeUnitEnum {
+public enum QmqUnit {
 	/**
 	 * 1 秒
 	 */
@@ -59,7 +59,7 @@ public enum TimeUnitEnum {
 	private final long duration;
 	private final TimeUnit timeUnit;
 
-	TimeUnitEnum(long duration, TimeUnit timeUnit) {
+	QmqUnit(long duration, TimeUnit timeUnit) {
 		this.duration = duration;
 		this.timeUnit = timeUnit;
 	}
