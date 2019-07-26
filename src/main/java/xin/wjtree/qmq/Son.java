@@ -1,15 +1,9 @@
 package xin.wjtree.qmq;
 
 import jdk.nashorn.internal.ir.annotations.Ignore;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import java.time.LocalDate;
 
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-@Data
 public class Son extends Father {
 
 	@Ignore
@@ -17,4 +11,19 @@ public class Son extends Father {
 
 	private LocalDate birtyDay;
 
+    public Double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(Double salary) {
+        this.salary = salary;
+    }
+
+    public LocalDate getBirtyDay() {
+        return birtyDay;
+    }
+
+    public void setBirtyDay(LocalDate birtyDay) {
+        this.birtyDay = birtyDay;
+    }
 }

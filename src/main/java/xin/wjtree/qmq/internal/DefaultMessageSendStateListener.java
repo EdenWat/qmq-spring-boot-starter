@@ -1,6 +1,7 @@
 package xin.wjtree.qmq.internal;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import qunar.tc.qmq.Message;
 import qunar.tc.qmq.MessageSendStateListener;
 import qunar.tc.qmq.base.BaseMessage;
@@ -12,23 +13,24 @@ import qunar.tc.qmq.base.BaseMessage;
  * </ul>
  * @author Wang
  */
-@Slf4j
 public class DefaultMessageSendStateListener implements MessageSendStateListener {
-	/**
-	 * 消息发送成功时的回调方法
-	 * @param message 消息对象
-	 */
-	@Override
-	public void onSuccess(Message message) {
-		log.info("QMQ 异步消息发送成功，消息主题：{}，消息内容：{}", message.getSubject(), ((BaseMessage) message).getAttrs());
-	}
+    private static final Logger log = LoggerFactory.getLogger(DefaultMessageSendStateListener.class);
 
-	/**
-	 * 消息发送失败时的回调方法
-	 * @param message 消息对象
-	 */
-	@Override
-	public void onFailed(Message message) {
-		log.error("QMQ 异步消息发送失败，消息主题：{}，消息内容：{}", message.getSubject(), ((BaseMessage) message).getAttrs());
-	}
+    /**
+     * 消息发送成功时的回调方法
+     * @param message 消息对象
+     */
+    @Override
+    public void onSuccess(Message message) {
+        log.info("QMQ 异步消息发送成功，消息主题：{}，消息内容：{}", message.getSubject(), ((BaseMessage) message).getAttrs());
+    }
+
+    /**
+     * 消息发送失败时的回调方法
+     * @param message 消息对象
+     */
+    @Override
+    public void onFailed(Message message) {
+        log.error("QMQ 异步消息发送失败，消息主题：{}，消息内容：{}", message.getSubject(), ((BaseMessage) message).getAttrs());
+    }
 }
