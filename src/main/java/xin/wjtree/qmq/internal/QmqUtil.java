@@ -1,61 +1,112 @@
 package xin.wjtree.qmq.internal;
 
-import org.apache.commons.beanutils.PropertyUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Field;
 import java.nio.charset.Charset;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * QMQ 内部工具类
  * @author kye
  */
 public class QmqUtil {
-    private static final Logger log = LoggerFactory.getLogger(QmqUtil.class);
-
     /**
      * 将 Object 转换为 Map
-     * @param object 消息对象
+     * @param bean 消息对象
      * @return Map
      */
-    public static Map<String, Object> objToMap(Object object) {
+    public static Map<String, Object> beanToMap(Object bean) {
         // 参数校验，Object 不能是基础数据类型或 Map
-        if (ObjectUtils.isEmpty(object)) {
-            throw new QmqException("QMQ 消息对象 Object 不能为空");
+        if (ObjectUtils.isEmpty(bean)) {
+            throw new QmqException("QMQ 消息对象 bean 不能为空");
         }
-        if (object.getClass().isPrimitive() || object instanceof Map) {
-            throw new QmqException("QMQ 消息对象 Object 不能是基本数据类型或 Map 类型");
-        }
-
-        // TODO 增加注解，设置注解属性为别名，标记注解别名的，发送消息时 key 会使用别名而不是字段名
-        Map<String, Object> describe = null;
-
-        try {
-            // 将 Object 转换为 Map
-            describe = PropertyUtils.describe(object);
-            if (CollectionUtils.isEmpty(describe)) {
-                log.warn("QMQ 消息对象无法转换为 Map ，转换结果为空");
-                return null;
-            }
-
-            // 移除 Object 的 class 名称
-            describe.remove("class");
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
-            log.error("QMQ 消息对象无法转换为 Map", ex);
+        if (bean.getClass().isPrimitive() || bean instanceof Map) {
+            throw new QmqException("QMQ 消息对象 bean 不能是基本数据类型或 Map 类型");
         }
 
-        return describe;
+        // 获取指定实体类的所有属性
+        List<Field> fields = getFieldsExcludeIgnore(bean.getClass());
+        if (CollectionUtils.isEmpty(fields)) {
+            throw new QmqException("QMQ 消息对象 Object 不是标准的 JavaBean 或者属性为空");
+        }
+
+        Map<String, Object> map = new HashMap<>(fields.size());
+        // 遍历装载每个属性的名称和值，返回 Map
+        fields.forEach(f -> map.put(getName(f), getValue(f, bean)));
+        // 如果 Map 为空，则返回空
+        return CollectionUtils.isEmpty(map) ? null : map;
     }
 
-    public static Map<String, Object> objToMap2(Object object) {
-        Class<?> aClass = object.getClass();
+    /**
+     * 获取属性名称
+     * @param field 实体类属性
+     * @return String
+     */
+    private static String getName(Field field) {
+        // 如果属性有别名修饰，则使用设置的属性别名
+        if (field.isAnnotationPresent(QmqAlias.class)) {
+            String value = field.getDeclaredAnnotation(QmqAlias.class).value();
+            return StringUtils.hasText(value) ? value : field.getName();
+        }
 
-        return null;
+        return field.getName();
+    }
+
+    /**
+     * 获取属性值
+     * @param field 实体类属性
+     * @param bean 实体类对象实例
+     * @return Object
+     */
+    private static Object getValue(Field field, Object bean) {
+        try {
+            // 读取私有属性必须设置为 true
+            field.setAccessible(true);
+            return field.get(bean);
+        } catch (IllegalAccessException ex) {
+            throw new QmqException("QMQ 实体类转换 Map 出错", ex);
+        }
+    }
+
+    /**
+     * 获取指定类及其父类的所有属性，包括私有属性，并过滤 QmqIgnore 注解修饰的属性
+     * @param type 类型
+     * @return 类的所有属性
+     */
+    private static List<Field> getFieldsExcludeIgnore(Class type) {
+        // 获取指定类所有属性
+        List<Field> fields = getDeclaredFields(type);
+        if (CollectionUtils.isEmpty(fields)) {
+            return null;
+        }
+        // 过滤掉 QmqIgnore 注解修饰的属性
+        return fields.stream().filter(field -> !field.isAnnotationPresent(QmqIgnore.class))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 获取指定类及其父类的所有属性，包括私有属性
+     * @param type 类型
+     * @return 类的所有属性
+     */
+    private static List<Field> getDeclaredFields(Class type) {
+        if (type == null) {
+            return null;
+        }
+
+        List<Field> fields = new ArrayList<>();
+        // 遍历父类
+        while (type != null) {
+            // 获取当前类的所有属性，包括私有属性
+            fields.addAll(Arrays.asList(type.getDeclaredFields()));
+            // 重置为父类的类型
+            type = type.getSuperclass();
+        }
+        return fields;
     }
 
     /**

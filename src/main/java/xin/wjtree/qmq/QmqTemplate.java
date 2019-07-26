@@ -9,7 +9,7 @@ import qunar.tc.qmq.MessageSendStateListener;
 import qunar.tc.qmq.base.BaseMessage;
 import xin.wjtree.qmq.autoconfigure.QmqProperties;
 import xin.wjtree.qmq.constant.QmqConstant;
-import xin.wjtree.qmq.constant.QmqUnit;
+import xin.wjtree.qmq.constant.QmqTimeUnit;
 import xin.wjtree.qmq.internal.DefaultMessageSendStateListener;
 import xin.wjtree.qmq.internal.QmqUtil;
 
@@ -88,10 +88,10 @@ public class QmqTemplate {
      * 发送延迟消息到指定主题，无标签，消息内容使用 Object
      * @param subject 消息主题
      * @param object 消息对象
-     * @param qmqUnit {@link QmqUnit} 时间单位枚举
+     * @param qmqTimeUnit {@link QmqTimeUnit} 时间单位枚举
      */
-    public void sendDelay(String subject, Object object, QmqUnit qmqUnit) {
-        sendDelay(subject, object, qmqUnit.getDuration(), qmqUnit.getTimeUnit());
+    public void sendDelay(String subject, Object object, QmqTimeUnit qmqTimeUnit) {
+        sendDelay(subject, object, qmqTimeUnit.getDuration(), qmqTimeUnit.getTimeUnit());
     }
 
     /**
@@ -114,7 +114,7 @@ public class QmqTemplate {
      * @param timeUnit 延时时间单位
      */
     public void sendDelay(String subject, String tag, Object object, long duration, TimeUnit timeUnit) {
-        sendDelay(subject, tag, QmqUtil.objToMap(object), duration, timeUnit);
+        sendDelay(subject, tag, QmqUtil.beanToMap(object), duration, timeUnit);
     }
 
     /**
@@ -153,7 +153,7 @@ public class QmqTemplate {
      * @param date 消息发送日期，用于延迟或定时发送
      */
     public void sendSchedule(String subject, String tag, Object object, Date date) {
-        sendSchedule(subject, tag, QmqUtil.objToMap(object), date);
+        sendSchedule(subject, tag, QmqUtil.beanToMap(object), date);
     }
 
     /**
@@ -187,7 +187,7 @@ public class QmqTemplate {
      * @param object 消息对象
      */
     public void send(String subject, String tag, Object object) {
-        send(subject, tag, QmqUtil.objToMap(object));
+        send(subject, tag, QmqUtil.beanToMap(object));
     }
 
     /**
@@ -271,7 +271,6 @@ public class QmqTemplate {
             log.warn("QMQ 消息内容的键值对为空，key：{}，value：{}", entry.getKey(), entry.getValue());
             return;
         }
-
         // 声明消息内容的键值对
         String key = entry.getKey();
         Object value = entry.getValue();
