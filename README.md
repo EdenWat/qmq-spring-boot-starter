@@ -42,8 +42,6 @@ spring:
 
     # 消费者配置，消费消息的线程池的设置，选填
     consumer:
-      # 线程池名称，默认 qmqExecutor
-      executor-name: qmqExecutor
       # 线程名称前缀，默认 qmq-process
       thread-name-prefix: qmq-process
       # 线程池大小，默认 2
