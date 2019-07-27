@@ -33,10 +33,10 @@ public class QmqUtil {
         if (CollectionUtils.isEmpty(fields)) {
             throw new QmqException("QMQ 消息对象 Object 不是标准的 JavaBean 或者属性为空");
         }
-
         Map<String, Object> map = new HashMap<>(fields.size());
         // 遍历装载每个属性的名称和值，返回 Map
         fields.forEach(f -> map.put(getName(f), getValue(f, bean)));
+
         // 如果 Map 为空，则返回空
         return CollectionUtils.isEmpty(map) ? null : map;
     }
