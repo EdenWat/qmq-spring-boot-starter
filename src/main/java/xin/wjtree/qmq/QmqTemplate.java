@@ -14,6 +14,8 @@ import xin.wjtree.qmq.internal.DefaultMessageSendStateListener;
 import xin.wjtree.qmq.internal.QmqException;
 import xin.wjtree.qmq.internal.QmqUtil;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Map;
@@ -281,17 +283,27 @@ public class QmqTemplate {
         // 判断 value 的数据类型，并装载消息内容
         if (value instanceof Boolean) {
             message.setProperty(key, (Boolean) value);
+        } else if (value instanceof Byte) {
+            message.setProperty(key, ((Byte) value).intValue());
+        } else if (value instanceof Short) {
+            message.setProperty(key, ((Short) value).intValue());
         } else if (value instanceof Integer) {
             message.setProperty(key, (Integer) value);
         } else if (value instanceof Long) {
             message.setProperty(key, (Long) value);
+        } else if (value instanceof BigInteger) {
+            message.setProperty(key, ((BigInteger) value).longValue());
         } else if (value instanceof Float) {
             message.setProperty(key, (Float) value);
         } else if (value instanceof Double) {
             message.setProperty(key, (Double) value);
+        } else if (value instanceof BigDecimal) {
+            message.setProperty(key, ((BigDecimal) value).doubleValue());
         } else if (value instanceof Date) {
             message.setProperty(key, (Date) value);
-        } else if (value instanceof String) {
+        } else if (value instanceof Character) {
+            message.setProperty(key, ((Character) value).toString());
+        } else if (value instanceof CharSequence) {
             String str = (String) value;
             // 判断字符串大小是否超过32K，使用 UTF-8 编码
             if (QmqUtil.isLargeString(str, StandardCharsets.UTF_8)) {
