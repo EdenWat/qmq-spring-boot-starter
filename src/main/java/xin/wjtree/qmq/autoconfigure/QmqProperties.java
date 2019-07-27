@@ -17,7 +17,6 @@ public class QmqProperties {
 
     /**
      * QMQ MetaServer Address，默认值 http://127.0.0.1:8080/meta/address，
-     * 可使用 host 和 port 配置替换
      */
     private String metaServer = QmqConstant.DEFAULT_META_SERVER;
 
