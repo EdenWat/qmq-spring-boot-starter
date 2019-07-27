@@ -3,13 +3,13 @@
 - QMQ - https://github.com/qunarcorp/qmq
 - Spring Boot Starter for QMQ - https://github.com/wjtree/qmq-spring-boot-starter
 
-## 引入 Maven 依赖（中央仓库）
+## 引入 Maven 依赖（已上传到中央仓库）
 
 ```
 <dependency>
     <groupId>xin.wjtree.qmq</groupId>
     <artifactId>qmq-spring-boot-starter</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
