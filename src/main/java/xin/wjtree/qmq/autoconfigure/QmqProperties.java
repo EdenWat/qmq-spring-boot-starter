@@ -5,6 +5,9 @@ import xin.wjtree.qmq.constant.QmqConstant;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author kye
  */
@@ -19,6 +22,16 @@ public class QmqProperties {
      * QMQ MetaServer Address，默认值 http://127.0.0.1:8080/meta/address
      */
     private String metaServer = QmqConstant.DEFAULT_META_SERVER;
+
+    /**
+     * QMQ 消费者主题
+     */
+    private Map<String, String> subject = new HashMap<>();
+
+    /**
+     * QMQ 消费者分组
+     */
+    private Map<String, String> group = new HashMap<>();
 
     /**
      * QMQ 消息发送者配置
@@ -50,6 +63,22 @@ public class QmqProperties {
 
     public void setMetaServer(String metaServer) {
         this.metaServer = metaServer;
+    }
+
+    public Map<String, String> getSubject() {
+        return subject;
+    }
+
+    public void setSubject(Map<String, String> subject) {
+        this.subject = subject;
+    }
+
+    public Map<String, String> getGroup() {
+        return group;
+    }
+
+    public void setGroup(Map<String, String> group) {
+        this.group = group;
     }
 
     public Producer getProducer() {
