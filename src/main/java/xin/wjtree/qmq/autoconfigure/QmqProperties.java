@@ -16,7 +16,7 @@ public class QmqProperties {
     private String appCode = QmqConstant.DEFAULT_APP_CODE;
 
     /**
-     * QMQ MetaServer Address，默认值 http://127.0.0.1:8080/meta/address，
+     * QMQ MetaServer Address，默认值 http://127.0.0.1:8080/meta/address
      */
     private String metaServer = QmqConstant.DEFAULT_META_SERVER;
 
