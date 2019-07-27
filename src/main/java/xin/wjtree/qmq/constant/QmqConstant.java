@@ -83,5 +83,5 @@ public final class QmqConstant {
     /**
      * 消息接收者属性：默认消费线程池名称
      */
-    public static final String DEFAULT_EXECUTOR_NAME = "qmqExecutor";
+    public static final String EXECUTOR_NAME = "qmqExecutor";
 }

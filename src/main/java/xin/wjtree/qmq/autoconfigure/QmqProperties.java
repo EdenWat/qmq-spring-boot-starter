@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author kye
+ * @author Wang
  */
 @ConfigurationProperties("spring.qmq")
 public class QmqProperties {
@@ -223,11 +223,6 @@ public class QmqProperties {
          */
         private String threadNamePrefix = QmqConstant.DEFAULT_THREAD_NAME_PREFIX;
 
-        /**
-         * 线程池名称，默认 qmqExecutor
-         */
-        private String executorName = QmqConstant.DEFAULT_EXECUTOR_NAME;
-
         public Integer getCorePoolSize() {
             return corePoolSize != null && corePoolSize > 0 ? corePoolSize : QmqConstant.DEFAULT_CORE_POOL_SIZE;
         }
@@ -258,14 +253,6 @@ public class QmqProperties {
 
         public void setThreadNamePrefix(String threadNamePrefix) {
             this.threadNamePrefix = threadNamePrefix;
-        }
-
-        public String getExecutorName() {
-            return StringUtils.hasText(executorName) ? executorName : QmqConstant.DEFAULT_EXECUTOR_NAME;
-        }
-
-        public void setExecutorName(String executorName) {
-            this.executorName = executorName;
         }
     }
 }

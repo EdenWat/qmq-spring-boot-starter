@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 /**
  * QMQ 内部工具类
- * @author kye
+ * @author Wang
  */
 public class QmqUtil {
     /**

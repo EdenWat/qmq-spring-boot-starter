@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * QMQ 消息发送模板
- * @author kye
+ * @author Wang
  */
 public class QmqTemplate {
     private static final Logger log = LoggerFactory.getLogger(QmqTemplate.class);
