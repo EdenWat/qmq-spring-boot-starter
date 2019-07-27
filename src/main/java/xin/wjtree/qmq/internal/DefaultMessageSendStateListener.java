@@ -22,7 +22,9 @@ public class DefaultMessageSendStateListener implements MessageSendStateListener
      */
     @Override
     public void onSuccess(Message message) {
-        log.info("QMQ 异步消息发送成功，消息主题：{}，消息内容：{}", message.getSubject(), ((BaseMessage) message).getAttrs());
+        if (log.isDebugEnabled()) {
+            log.debug("QMQ 异步消息发送成功，消息主题：{}，消息内容：{}", message.getSubject(), ((BaseMessage) message).getAttrs());
+        }
     }
 
     /**

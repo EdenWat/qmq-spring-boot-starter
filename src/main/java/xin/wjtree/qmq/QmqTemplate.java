@@ -11,6 +11,7 @@ import xin.wjtree.qmq.autoconfigure.QmqProperties;
 import xin.wjtree.qmq.constant.QmqConstant;
 import xin.wjtree.qmq.constant.QmqTimeUnit;
 import xin.wjtree.qmq.internal.DefaultMessageSendStateListener;
+import xin.wjtree.qmq.internal.QmqException;
 import xin.wjtree.qmq.internal.QmqUtil;
 
 import java.nio.charset.StandardCharsets;
@@ -226,8 +227,8 @@ public class QmqTemplate {
             message.addTag(tag);
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("QMQ 异步消息准备发送，消息主题：{}，消息内容：{}", message.getSubject(), message.getAttrs());
+        if (log.isTraceEnabled()) {
+            log.trace("QMQ 异步消息准备发送，消息主题：{}，消息内容：{}", message.getSubject(), message.getAttrs());
         }
         // 发送消息，并返回回调结果
         producer.sendMessage(message, listener);
@@ -268,7 +269,9 @@ public class QmqTemplate {
     private void bindMessage(BaseMessage message, Map.Entry<String, Object> entry) {
         // 键值对校验
         if (StringUtils.isEmpty(entry.getKey()) || entry.getValue() == null) {
-            log.warn("QMQ 消息内容的键值对为空，key：{}，value：{}", entry.getKey(), entry.getValue());
+            if (log.isTraceEnabled()) {
+                log.trace("QMQ 消息内容的键值对为空，key：{}，value：{}", entry.getKey(), entry.getValue());
+            }
             return;
         }
         // 声明消息内容的键值对
@@ -297,7 +300,7 @@ public class QmqTemplate {
                 message.setProperty(key, str);
             }
         } else {
-            throw new IllegalStateException("Unexpected value: " + value.getClass());
+            throw new QmqException("Unexpected value: " + value.getClass());
         }
     }
 }
