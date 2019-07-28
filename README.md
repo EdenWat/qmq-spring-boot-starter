@@ -1,14 +1,15 @@
 # 使用方式
 
+![Codacy Badge](https://api.codacy.com/project/badge/Grade/87cd0b4d6b0c4282ad730678fa8da4b4)
+![GitHub repo size](https://img.shields.io/github/repo-size/wjtree/qmq-spring-boot-starter)
 ![Maven Central](https://img.shields.io/maven-central/v/xin.wjtree.qmq/qmq-spring-boot-starter)
 ![GitHub release](https://img.shields.io/github/release/wjtree/qmq-spring-boot-starter)
 ![GitHub](https://img.shields.io/github/license/wjtree/qmq-spring-boot-starter)
-![GitHub repo size](https://img.shields.io/github/repo-size/wjtree/qmq-spring-boot-starter)
 ![GitHub All Releases](https://img.shields.io/github/downloads/wjtree/qmq-spring-boot-starter/total)
 ![Gitter](https://img.shields.io/gitter/room/wjtree/qmq-spring-boot-starter)
 
-- QMQ - https://github.com/qunarcorp/qmq
-- Spring Boot Starter for QMQ - https://github.com/wjtree/qmq-spring-boot-starter
+* [QMQ](https://github.com/qunarcorp/qmq)
+* [Spring Boot Starter for QMQ](https://github.com/wjtree/qmq-spring-boot-starter)
 
 ## 引入 Maven 依赖（已上传到中央仓库）
 
@@ -296,7 +297,7 @@ public class QmqTest {
 
 ### 启用消费者模式
 
-- 在配置类上添加 EnableQmq 注解，包括 appCode 和 metaServer 属性
+* 在配置类上添加 EnableQmq 注解，包括 appCode 和 metaServer 属性
 
 ```java
 import org.springframework.boot.SpringApplication;
@@ -316,8 +317,8 @@ public class QmqApplication {
 
 ### 配置消费监听器
 
-- 在方法上添加 QmqConsumer 注解，包括 subject，consumerGroup，executor 等属性
-- executor = `QmqConstant.EXECUTOR_NAME` 表示消费线程池的 BeanName，该值固定为 `qmqExecutor`
+* 在方法上添加 QmqConsumer 注解，包括 subject，consumerGroup，executor 等属性
+* executor = `QmqConstant.EXECUTOR_NAME` 表示消费线程池的 BeanName，该值固定为 `qmqExecutor`
 
 ```java
 import lombok.extern.slf4j.Slf4j;

@@ -98,13 +98,14 @@ public class QmqUtil {
             return null;
         }
 
+        Class tempClass = type;
         List<Field> fields = new ArrayList<>();
         // 遍历父类
-        while (type != null) {
+        while (tempClass != null) {
             // 获取当前类的所有属性，包括私有属性
-            fields.addAll(Arrays.asList(type.getDeclaredFields()));
+            fields.addAll(Arrays.asList(tempClass.getDeclaredFields()));
             // 重置为父类的类型
-            type = type.getSuperclass();
+            tempClass = tempClass.getSuperclass();
         }
         return fields;
     }
