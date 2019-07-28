@@ -297,7 +297,7 @@ public class QmqTest {
 
 ### 启用消费者模式
 
->在配置类上添加 EnableQmq 注解，包括 appCode 和 metaServer 属性
+> 在配置类上添加 EnableQmq 注解，包括 appCode 和 metaServer 属性
 
 ```java
 import org.springframework.boot.SpringApplication;
@@ -317,8 +317,8 @@ public class QmqApplication {
 
 ### 配置消费监听器
 
->在方法上添加 QmqConsumer 注解，包括 subject，consumerGroup，executor 等属性  
->executor = `QmqConstant.EXECUTOR_NAME` 表示消费线程池的 BeanName，该值固定为 `qmqExecutor`
+> 在方法上添加 QmqConsumer 注解，包括 subject，consumerGroup，executor 等属性  
+> executor = `QmqConstant.EXECUTOR_NAME` 表示消费线程池的 BeanName，该值固定为 `qmqExecutor`
 
 ```java
 import lombok.extern.slf4j.Slf4j;
