@@ -1,5 +1,7 @@
 # 使用方式
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d599e45b237e49cbb82462924e82a335)](https://app.codacy.com/app/wjtree/qmq-spring-boot-starter?utm_source=github.com&utm_medium=referral&utm_content=wjtree/qmq-spring-boot-starter&utm_campaign=Badge_Grade_Settings)
+
 ![Maven Central](https://img.shields.io/maven-central/v/xin.wjtree.qmq/qmq-spring-boot-starter)
 ![GitHub release](https://img.shields.io/github/release/wjtree/qmq-spring-boot-starter)
 ![GitHub](https://img.shields.io/github/license/wjtree/qmq-spring-boot-starter)
