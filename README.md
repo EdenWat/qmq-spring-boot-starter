@@ -7,7 +7,6 @@
 ![GitHub All Releases](https://img.shields.io/github/downloads/wjtree/qmq-spring-boot-starter/total)
 ![Gitter](https://img.shields.io/gitter/room/wjtree/qmq-spring-boot-starter)
 
-
 - QMQ - https://github.com/qunarcorp/qmq
 - Spring Boot Starter for QMQ - https://github.com/wjtree/qmq-spring-boot-starter
 
