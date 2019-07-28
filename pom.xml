@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>xin.wjtree.qmq</groupId>
     <artifactId>qmq-spring-boot-starter</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
     <description>Spring Boot with QMQ support,help you simplify QMQ config in Spring Boot.</description>
