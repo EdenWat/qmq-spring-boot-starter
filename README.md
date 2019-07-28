@@ -5,7 +5,7 @@
 
 ## 引入 Maven 依赖（已上传到中央仓库）
 
-```
+```xml
 <dependency>
     <groupId>xin.wjtree.qmq</groupId>
     <artifactId>qmq-spring-boot-starter</artifactId>
@@ -15,7 +15,7 @@
 
 ## 添加 Spring Boot 配置（YML）
 
-```
+```properties
 spring:
   application:
     name: qmq-demo
@@ -75,7 +75,7 @@ server:
 
 ## 发送消息
 
-```
+```java
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -291,7 +291,7 @@ public class QmqTest {
 
 - 在配置类上添加 EnableQmq 注解，包括 appCode 和 metaServer 属性
 
-```
+```java
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import qunar.tc.qmq.consumer.annotation.EnableQmq;
@@ -312,7 +312,7 @@ public class QmqApplication {
 - 在方法上添加 QmqConsumer 注解，包括 subject，consumerGroup，executor 等属性
 - executor = `QmqConstant.EXECUTOR_NAME` 表示消费线程池的 BeanName，该值固定为 `qmqExecutor`
 
-```
+```java
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import qunar.tc.qmq.Message;
