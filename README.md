@@ -1,4 +1,4 @@
-# 使用方式
+# qmq-spring-boot-starter
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/xin.wjtree.qmq/qmq-spring-boot-starter/badge.svg)](http://search.maven.org/#search%7Cga%7C1%7Cxin.wjtree.qmq)
 [![GitHub release](https://img.shields.io/github/release/wjtree/qmq-spring-boot-starter)](https://github.com/wjtree/qmq-spring-boot-starter/releases)
