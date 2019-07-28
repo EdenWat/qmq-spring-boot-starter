@@ -1,10 +1,11 @@
 # 使用方式
 
-![Codacy Badge](https://api.codacy.com/project/badge/Grade/87cd0b4d6b0c4282ad730678fa8da4b4)
-![GitHub repo size](https://img.shields.io/github/repo-size/wjtree/qmq-spring-boot-starter)
 ![Maven Central](https://img.shields.io/maven-central/v/xin.wjtree.qmq/qmq-spring-boot-starter)
 ![GitHub release](https://img.shields.io/github/release/wjtree/qmq-spring-boot-starter)
 ![GitHub](https://img.shields.io/github/license/wjtree/qmq-spring-boot-starter)
+![Travis (.org)](https://img.shields.io/travis/wjtree/qmq-spring-boot-starter)
+![Codacy Badge](https://api.codacy.com/project/badge/Grade/87cd0b4d6b0c4282ad730678fa8da4b4)
+![GitHub repo size](https://img.shields.io/github/repo-size/wjtree/qmq-spring-boot-starter)
 ![GitHub All Releases](https://img.shields.io/github/downloads/wjtree/qmq-spring-boot-starter/total)
 ![Gitter](https://img.shields.io/gitter/room/wjtree/qmq-spring-boot-starter)
 
