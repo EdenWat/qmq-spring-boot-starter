@@ -6,8 +6,9 @@
 [![Build Status](https://travis-ci.com/wjtree/qmq-spring-boot-starter.svg?branch=master)](https://travis-ci.com/wjtree/qmq-spring-boot-starter)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/87cd0b4d6b0c4282ad730678fa8da4b4)](https://www.codacy.com/app/wjtree/qmq-spring-boot-starter?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wjtree/qmq-spring-boot-starter&amp;utm_campaign=Badge_Grade)
 ![GitHub repo size](https://img.shields.io/github/repo-size/wjtree/qmq-spring-boot-starter)
-[![Gitter](https://badges.gitter.im/wjtree-code/community.svg)](https://gitter.im/wjtree-code/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+![GitHub All Releases](https://img.shields.io/github/downloads/wjtree/qmq-spring-boot-starter/total)
 [![GitHub issues](https://img.shields.io/github/issues/wjtree/qmq-spring-boot-starter)](https://github.com/wjtree/qmq-spring-boot-starter/issues)
+[![Gitter](https://badges.gitter.im/wjtree-code/community.svg)](https://gitter.im/wjtree-code/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 > [QMQ](https://github.com/qunarcorp/qmq)  
 > [Spring Boot Starter for QMQ](https://github.com/wjtree/qmq-spring-boot-starter)
