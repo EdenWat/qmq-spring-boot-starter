@@ -13,7 +13,7 @@ import qunar.tc.qmq.MessageConsumer;
 import qunar.tc.qmq.MessageProducer;
 import qunar.tc.qmq.producer.MessageProducerProvider;
 import xin.wjtree.qmq.QmqTemplate;
-import xin.wjtree.qmq.constant.QmqConstant;
+import xin.wjtree.qmq.constant.QmqHelper;
 
 /**
  * @author Wang
@@ -66,8 +66,8 @@ public class QmqAutoConfigure {
         return new QmqTemplate(producer, prop);
     }
 
-    @Bean(QmqConstant.EXECUTOR_NAME)
-    @ConditionalOnMissingBean(name = QmqConstant.EXECUTOR_NAME)
+    @Bean(QmqHelper.EXECUTOR_NAME)
+    @ConditionalOnMissingBean(name = QmqHelper.EXECUTOR_NAME)
     @ConditionalOnBean(MessageConsumer.class)
     public ThreadPoolExecutorFactoryBean threadPoolExecutorFactoryBean(QmqProperties properties) {
         // 获取消息接收者配置

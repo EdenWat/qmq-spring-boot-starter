@@ -4,7 +4,7 @@ package xin.wjtree.qmq.constant;
  * QMQ 常量
  * @author Wang
  */
-public final class QmqConstant {
+public final class QmqHelper {
     /**
      * Qmq MetaServer 模板
      */

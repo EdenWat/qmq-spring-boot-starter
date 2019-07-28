@@ -328,14 +328,14 @@ import org.springframework.stereotype.Component;
 import qunar.tc.qmq.Message;
 import qunar.tc.qmq.base.BaseMessage;
 import qunar.tc.qmq.consumer.annotation.QmqConsumer;
-import xin.wjtree.qmq.constant.QmqConstant;
+import xin.wjtree.qmq.constant.QmqHelper;
 
 @Slf4j
 @Component
 public class QmqLinstener {
 
     @QmqConsumer(subject = "${spring.qmq.subject.sub1}", consumerGroup = "${spring.qmq.group.group1}",
-            executor = QmqConstant.EXECUTOR_NAME)
+            executor = QmqHelper.EXECUTOR_NAME)
     public void onMessage(Message message) {
         log.info("qmq 消费主题：{}，消费消息：{}", message.getSubject(), ((BaseMessage) message).getAttrs());
     }

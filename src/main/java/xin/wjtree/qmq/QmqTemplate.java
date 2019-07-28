@@ -8,7 +8,7 @@ import qunar.tc.qmq.MessageProducer;
 import qunar.tc.qmq.MessageSendStateListener;
 import qunar.tc.qmq.base.BaseMessage;
 import xin.wjtree.qmq.autoconfigure.QmqProperties;
-import xin.wjtree.qmq.constant.QmqConstant;
+import xin.wjtree.qmq.constant.QmqHelper;
 import xin.wjtree.qmq.constant.QmqTimeUnit;
 import xin.wjtree.qmq.internal.DefaultMessageSendStateListener;
 import xin.wjtree.qmq.internal.QmqException;
@@ -62,7 +62,7 @@ public class QmqTemplate {
      * @param object 消息对象
      * @param duration 延迟时间间隔
      * @param timeUnit 延时时间单位
-     * @see QmqConstant#DEFAULT_SUBJECT
+     * @see QmqHelper#DEFAULT_SUBJECT
      */
     public void sendDelayDefault(Object object, long duration, TimeUnit timeUnit) {
         sendDelay(properties.getDefaultSubject(), object, duration, timeUnit);
@@ -72,7 +72,7 @@ public class QmqTemplate {
      * 发送定时消息到默认主题，无标签，消息内容使用 Object
      * @param object 消息对象
      * @param date 消息发送日期，用于延迟或定时发送
-     * @see QmqConstant#DEFAULT_SUBJECT
+     * @see QmqHelper#DEFAULT_SUBJECT
      */
     public void sendScheduleDefault(Object object, Date date) {
         sendSchedule(properties.getDefaultSubject(), object, date);
@@ -81,7 +81,7 @@ public class QmqTemplate {
     /**
      * 发送即时消息到默认主题，无标签，消息内容使用 Object
      * @param object 消息对象
-     * @see QmqConstant#DEFAULT_SUBJECT
+     * @see QmqHelper#DEFAULT_SUBJECT
      */
     public void sendDefault(Object object) {
         send(properties.getDefaultSubject(), object);
