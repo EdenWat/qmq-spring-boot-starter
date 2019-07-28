@@ -2,7 +2,7 @@
 
 ![Maven Central](https://img.shields.io/maven-central/v/xin.wjtree.qmq/qmq-spring-boot-starter)
 ![GitHub release](https://img.shields.io/github/release/wjtree/qmq-spring-boot-starter)
-[![GitHub license](https://img.shields.io/github/license/wjtree/qmq-spring-boot-starter)](https://github.com/wjtree/qmq-spring-boot-starter/blob/master/LICENSE)
+![GitHub](https://img.shields.io/github/license/wjtree/qmq-spring-boot-starter)
 ![GitHub repo size](https://img.shields.io/github/repo-size/wjtree/qmq-spring-boot-starter)
 ![GitHub All Releases](https://img.shields.io/github/downloads/wjtree/qmq-spring-boot-starter/total)
 ![Gitter](https://img.shields.io/gitter/room/wjtree/qmq-spring-boot-starter)
