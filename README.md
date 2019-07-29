@@ -33,15 +33,15 @@ spring:
   application:
     name: qmq-demo
   qmq:
-    # 应用标识 appcode，必填
+    # qmq appcode，必填
     app-code: qmq-demo
-    # 服务器地址 metaserver，必填
+    # qmq metaserver，必填
     meta-server: http://127.0.0.1:8080/meta/address
 
     # 生产者配置，发送消息的线程池的设置，选填
     producer:
       # 发送线程数，默认 3
-      send-threads: 3
+      send-threads: 2
       # 默认每次发送时最大批量大小，默认 30
       send-batch: 30
       # 如果消息发送失败，重试次数，默认 10
@@ -51,12 +51,12 @@ spring:
 
     # 使用 QmqTemplate 发送消息的默认主题，默认值 default_subject
     template:
-      default-subject: default_subject
+      default-subject: my_default_sub
 
     # 消费者配置，消费消息的线程池的设置，选填
     consumer:
       # 线程名称前缀，默认 qmq-process
-      thread-name-prefix: qmq-process
+      thread-name-prefix: my-qmq-process-
       # 线程池大小，默认 2
       core-pool-size: 2
       # 最大线程池大小，默认 2
@@ -67,14 +67,14 @@ spring:
     # 消息主题和分组配置，选填
     # 使用 QmqConsumer 注解时，可使用 SpEL 表达式引入以下主题和分组
     subject:
-      sub1: sub1
-      sub2: sub2
-      sub3: sub3
+      sub1: qmq_sub1
+      sub2: qmq_sub2
+      sub3: qmq_sub3
       # more subject ...
     group:
-      group1: group1
-      group2: group2
-      group3: group3
+      group1: qmq_group1
+      group2: qmq_group2
+      group3: qmq_group3
       # more group ...
 
 logging:
@@ -89,109 +89,55 @@ server:
 ## 发送消息
 
 ```java
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import qunar.tc.qmq.Message;
 import qunar.tc.qmq.MessageSendStateListener;
-import xin.wjtree.qmq.autoconfigure.QmqProperties;
+import xin.wjtree.qmq.QmqTemplate;
 import xin.wjtree.qmq.constant.QmqTimeUnit;
 import xin.wjtree.qmq.internal.QmqAlias;
 import xin.wjtree.qmq.internal.QmqIgnore;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class QmqTest {
+public class JunitTest {
     @Resource
     private QmqTemplate template;
-    @Resource
-    private QmqProperties properties;
 
-    /**
-     * 发送即时消息
-     * @throws InterruptedException
-     */
     @Test
-    public void sendImmediate() throws InterruptedException {
+    public void send() throws InterruptedException {
         // 计数器，执行1次结束
         CountDownLatch latch = new CountDownLatch(1);
 
-        // 一般使用 template.send(properties.getSubject().get("sub1"), getUser()) 即可
-        template.withSendStateListener(new MessageSendStateListener() {
-            @Override
-            public void onSuccess(Message m) {
-                latch.countDown();
-            }
+        // 使用链式调用方式
+        template
+                // 消息发送状态监听器，此处只是为了 junit 测试使用，如果没有自定义需求，可以不设置
+                .listener(new MessageSendStateListener() {
+                    @Override
+                    public void onSuccess(Message m) {
+                        latch.countDown();
+                    }
 
-            @Override
-            public void onFailed(Message m) {
-                latch.countDown();
-            }
-        }).send(properties.getSubject().get("sub1"), getUser());
-
-        // 计数器减1
-        latch.await();
-    }
-
-    /**
-     * 发送延时消息
-     * @throws InterruptedException
-     */
-    @Test
-    public void sendDelay() throws InterruptedException {
-        // 计数器，执行1次结束
-        CountDownLatch latch = new CountDownLatch(1);
-
-        // 延时 10 秒发送消息
-        // 一般使用 template.sendDelay(properties.getSubject().get("sub1"), getUser(), QmqTimeUnit.TEN_SECONDS) 即可
-        template.withSendStateListener(new MessageSendStateListener() {
-            @Override
-            public void onSuccess(Message m) {
-                latch.countDown();
-            }
-
-            @Override
-            public void onFailed(Message m) {
-                latch.countDown();
-            }
-        }).sendDelay(properties.getSubject().get("sub1"), getUser(), QmqTimeUnit.TEN_SECONDS);
-
-        // 计数器减1
-        latch.await();
-    }
-
-    /**
-     * 发送定时消息
-     * @throws InterruptedException
-     */
-    @Test
-    public void sendSchedule() throws InterruptedException, ParseException {
-        // 计数器，执行1次结束
-        CountDownLatch latch = new CountDownLatch(1);
-
-        // 定时发送的日期时间
-        Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2019-07-28 00:16:00");
-
-        // 一般使用 template.sendSchedule(properties.getSubject().get("sub1"), getUser(), date) 即可
-        template.withSendStateListener(new MessageSendStateListener() {
-            @Override
-            public void onSuccess(Message m) {
-                latch.countDown();
-            }
-
-            @Override
-            public void onFailed(Message m) {
-                latch.countDown();
-            }
-        }).sendSchedule(properties.getSubject().get("sub1"), getUser(), date);
+                    @Override
+                    public void onFailed(Message m) {
+                        latch.countDown();
+                    }
+                })
+                // 消息主题，如果不填，会使用默认的消息主题
+                .subject("sub1")
+                // 延时 10 秒接收消息
+                .delay(QmqTimeUnit.TEN_SECONDS)
+                // 定时 2019-07-30 00:46:00 接收消息
+                //                .delay(LocalDateTime.of(2019, 7, 30, 0, 46, 0))
+                // 发送消息，支持 Map 或 Object 实体类
+                .send(getUser());
 
         // 计数器减1
         latch.await();
@@ -308,13 +254,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import qunar.tc.qmq.consumer.annotation.EnableQmq;
 
-@EnableQmq(appCode="${spring.qmq.app-code}", metaServer="${spring.qmq.meta-server}")
+@EnableQmq(appCode = "${spring.qmq.app-code}", metaServer = "${spring.qmq.meta-server}")
 @SpringBootApplication
 public class QmqApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(QmqApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(QmqApplication.class, args);
+    }
 
 }
 ```
@@ -339,7 +285,7 @@ public class QmqLinstener {
     @QmqConsumer(subject = "${spring.qmq.subject.sub1}", consumerGroup = "${spring.qmq.group.group1}",
             executor = QmqHelper.EXECUTOR_NAME)
     public void onMessage(Message message) {
-        log.info("qmq 消费主题：{}，消费消息：{}", message.getSubject(), ((BaseMessage) message).getAttrs());
+        log.info("QMQ 消费主题：{}，消费消息：{}", message.getSubject(), ((BaseMessage) message).getAttrs());
     }
 
 }
