@@ -57,13 +57,10 @@ public class QmqAutoConfigure {
     @ConditionalOnMissingBean(QmqTemplate.class)
     @ConditionalOnBean(MessageProducer.class)
     public QmqTemplate qmqTemplate(MessageProducer producer, QmqProperties properties) {
-        // 获取消息生产者模板配置
-        QmqProperties.Template prop = properties.getTemplate();
-
         if (log.isDebugEnabled()) {
-            log.debug("Init QmqTemplate Success, defaultSubject: {}", prop.getDefaultSubject());
+            log.debug("Init QmqTemplate Success, defaultSubject: {}", properties.getTemplate().getDefaultSubject());
         }
-        return new QmqTemplate(producer, prop);
+        return new QmqTemplate(producer, properties);
     }
 
     @Bean(QmqHelper.EXECUTOR_NAME)

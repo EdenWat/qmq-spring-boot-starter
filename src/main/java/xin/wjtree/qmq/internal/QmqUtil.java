@@ -6,6 +6,8 @@ import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -129,5 +131,14 @@ public class QmqUtil {
         // 使用指定编码，计算出字节数
         // 将 32k 转换为字节，1 KB = 1024 bytes
         return str.getBytes(charset).length >= 32 * 1024;
+    }
+
+    /**
+     * 将 LocalDateTime 转换成 Date
+     * @param localDateTime {@link LocalDateTime}
+     * @return {@link Date}
+     */
+    public static Date localDateTimeToDate(LocalDateTime localDateTime) {
+        return localDateTime != null ? Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant()) : null;
     }
 }

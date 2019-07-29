@@ -2,13 +2,13 @@ package xin.wjtree.qmq;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import qunar.tc.qmq.MessageProducer;
 import qunar.tc.qmq.MessageSendStateListener;
 import qunar.tc.qmq.base.BaseMessage;
 import xin.wjtree.qmq.autoconfigure.QmqProperties;
-import xin.wjtree.qmq.constant.QmqHelper;
 import xin.wjtree.qmq.constant.QmqTimeUnit;
 import xin.wjtree.qmq.internal.DefaultMessageSendStateListener;
 import xin.wjtree.qmq.internal.QmqException;
@@ -17,6 +17,7 @@ import xin.wjtree.qmq.internal.QmqUtil;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -25,232 +26,177 @@ import java.util.concurrent.TimeUnit;
  * QMQ 消息发送模板
  * @author Wang
  */
+@SuppressWarnings("unused")
 public class QmqTemplate {
     private static final Logger log = LoggerFactory.getLogger(QmqTemplate.class);
 
     /**
-     * QMQ 消息发送者
+     * 消息发送者
      */
     private final MessageProducer producer;
-    /**
-     * QMQ 自动配置属性
-     */
-    private final QmqProperties.Template properties;
 
     /**
-     * QMQ 消息发送状态监听器，默认的回调方法仅打印发送结果日志
+     * 自动配置属性
+     */
+    private final QmqProperties properties;
+
+    /**
+     * 消息发送主题
+     */
+    private String subject;
+
+    /**
+     * 消息标签
+     */
+    private String tag;
+
+    /**
+     * 消息接收时间
+     */
+    private Date receiveTime;
+
+    /**
+     * 消息发送状态监听器，默认的回调方法仅打印发送结果日志
      */
     private MessageSendStateListener listener = new DefaultMessageSendStateListener();
 
-    public QmqTemplate(MessageProducer producer, QmqProperties.Template properties) {
+    public QmqTemplate(MessageProducer producer, QmqProperties properties) {
         this.producer = producer;
         this.properties = properties;
+        // 初始化为默认主题
+        this.subject = properties.getTemplate().getDefaultSubject();
     }
 
     /**
-     * 设置自定义的消息发送状态监听器，使用链式调用方法
-     * @param listener 消息发送状态监听器
+     * 设置消息发送主题
+     * @param subject 主题名称
      * @return {@link QmqTemplate}
      */
-    public QmqTemplate withSendStateListener(MessageSendStateListener listener) {
-        this.listener = listener;
+    public QmqTemplate subject(String subject) {
+        if (StringUtils.hasText(subject)) {
+            // 尝试获取 spring.qmq.subject.[主题名称] 的键值对
+            String value = properties.getSubject().get(subject);
+            // 如果属性文件中有匹配的主题，则使用配置文件中的；否则直接使用入参名称作为主题名称
+            this.subject = StringUtils.hasText(value) ? value : subject;
+        }
         return this;
     }
 
     /**
-     * 发送延迟消息到默认主题，无标签，消息内容使用 Object
-     * @param object 消息对象
-     * @param duration 延迟时间间隔
-     * @param timeUnit 延时时间单位
-     * @see QmqHelper#DEFAULT_SUBJECT
+     * 设置消息发送主题的标签
+     * @param tag 标签名称
+     * @return {@link QmqTemplate}
      */
-    public void sendDelayDefault(Object object, long duration, TimeUnit timeUnit) {
-        sendDelay(properties.getDefaultSubject(), object, duration, timeUnit);
+    public QmqTemplate tag(String tag) {
+        if (StringUtils.hasText(tag)) {
+            this.tag = tag;
+        }
+        return this;
     }
 
     /**
-     * 发送定时消息到默认主题，无标签，消息内容使用 Object
-     * @param object 消息对象
-     * @param date 消息发送日期，用于延迟或定时发送
-     * @see QmqHelper#DEFAULT_SUBJECT
+     * 设置消息接收时间
+     * @param date 消息接收时间
+     * @return {@link QmqTemplate}
      */
-    public void sendScheduleDefault(Object object, Date date) {
-        sendSchedule(properties.getDefaultSubject(), object, date);
+    public QmqTemplate delay(Date date) {
+        if (date != null && date.getTime() > System.currentTimeMillis()) {
+            this.receiveTime = date;
+        }
+        return this;
     }
 
     /**
-     * 发送即时消息到默认主题，无标签，消息内容使用 Object
-     * @param object 消息对象
-     * @see QmqHelper#DEFAULT_SUBJECT
+     * 设置消息接收时间
+     * @param localDateTime 消息接收时间
+     * @return {@link QmqTemplate}
      */
-    public void sendDefault(Object object) {
-        send(properties.getDefaultSubject(), object);
+    public QmqTemplate delay(LocalDateTime localDateTime) {
+        if (localDateTime != null && localDateTime.isAfter(LocalDateTime.now())) {
+            this.receiveTime = QmqUtil.localDateTimeToDate(localDateTime);
+        }
+        return this;
     }
 
     /**
-     * 发送延迟消息到指定主题，无标签，消息内容使用 Object
-     * @param subject 消息主题
-     * @param object 消息对象
-     * @param qmqTimeUnit {@link QmqTimeUnit} 时间单位枚举
+     * 设置消息接收时间
+     * @param duration 时间间隔
+     * @param timeUnit 时间单位 {@link TimeUnit}
+     * @return {@link QmqTemplate}
      */
-    public void sendDelay(String subject, Object object, QmqTimeUnit qmqTimeUnit) {
-        sendDelay(subject, object, qmqTimeUnit.getDuration(), qmqTimeUnit.getTimeUnit());
+    public QmqTemplate delay(long duration, TimeUnit timeUnit) {
+        if (duration > 0 && timeUnit != null) {
+            long temp = System.currentTimeMillis() + timeUnit.toMillis(duration);
+            this.receiveTime = new Date(temp);
+        }
+        return this;
     }
 
     /**
-     * 发送延迟消息到指定主题，无标签，消息内容使用 Object
-     * @param subject 消息主题
-     * @param object 消息对象
-     * @param duration 延迟时间间隔
-     * @param timeUnit 延时时间单位
+     * 设置消息接收时间
+     * @param qmqTimeUnit {@link QmqTimeUnit}
+     * @return {@link QmqTemplate}
      */
-    public void sendDelay(String subject, Object object, long duration, TimeUnit timeUnit) {
-        sendDelay(subject, null, object, duration, timeUnit);
+    public QmqTemplate delay(QmqTimeUnit qmqTimeUnit) {
+        if (qmqTimeUnit != null) {
+            long temp = System.currentTimeMillis() + qmqTimeUnit.getTimeUnit().toMillis(qmqTimeUnit.getDuration());
+            this.receiveTime = new Date(temp);
+        }
+        return this;
     }
 
     /**
-     * 发送延迟消息到指定主题，消息内容使用 Object
-     * @param subject 消息主题
-     * @param tag 消息标签
-     * @param object 消息对象
-     * @param duration 延迟时间间隔
-     * @param timeUnit 延时时间单位
+     * 设置自定义的消息发送状态监听器
+     * @param listener 消息发送状态监听器
+     * @return {@link QmqTemplate}
      */
-    public void sendDelay(String subject, String tag, Object object, long duration, TimeUnit timeUnit) {
-        sendDelay(subject, tag, QmqUtil.beanToMap(object), duration, timeUnit);
+    public QmqTemplate listener(MessageSendStateListener listener) {
+        if (listener != null) {
+            this.listener = listener;
+        }
+        return this;
     }
 
     /**
-     * 发送延迟消息到指定主题，消息内容使用 Map
-     * @param subject 消息主题
-     * @param tag 消息标签
-     * @param content 消息内容
-     * @param duration 延迟时间间隔
-     * @param timeUnit 延时时间单位
+     * 设置消息发送内容，支持回调方法，消息内容使用 Object
+     * @param object 消息内容
      */
-    public void sendDelay(String subject, String tag, Map<String, Object> content, long duration, TimeUnit timeUnit) {
-        // 判断消息延迟发送时间
-        Assert.isTrue(duration > 0, "消息延迟接收时间不能为过去时");
-        Assert.notNull(timeUnit, "消息延迟接收时间单位不能为空");
-        // 讲延迟时间转换为毫秒
-        long sendTime = System.currentTimeMillis() + timeUnit.toMillis(duration);
+    public void send(Object object) {
+        if (ObjectUtils.isEmpty(object)) {
+            throw new QmqException("QMQ 消息发送内容不能为空");
+        }
 
-        sendMessage(subject, tag, content, new Date(sendTime));
-    }
-
-    /**
-     * 发送定时消息到指定主题，无标签，消息内容使用 Object
-     * @param subject 消息主题
-     * @param object 消息对象
-     * @param date 消息发送日期，用于延迟或定时发送
-     */
-    public void sendSchedule(String subject, Object object, Date date) {
-        sendSchedule(subject, null, object, date);
-    }
-
-    /**
-     * 发送定时消息到指定主题，消息内容使用 Object
-     * @param subject 消息主题
-     * @param tag 消息标签
-     * @param object 消息对象
-     * @param date 消息发送日期，用于延迟或定时发送
-     */
-    public void sendSchedule(String subject, String tag, Object object, Date date) {
-        sendSchedule(subject, tag, QmqUtil.beanToMap(object), date);
-    }
-
-    /**
-     * 发送定时消息到指定主题，消息内容使用 Map
-     * @param subject 消息主题
-     * @param tag 消息标签
-     * @param content 消息内容
-     * @param date 消息发送日期，用于延迟或定时发送
-     */
-    public void sendSchedule(String subject, String tag, Map<String, Object> content, Date date) {
-        // 判断消息定时发送时间
-        Assert.notNull(date, "消息定时接收时间不能为空");
-        Assert.isTrue(date.getTime() > System.currentTimeMillis(), "消息定时接收时间不能为过去时");
-
-        sendMessage(subject, tag, content, date);
-    }
-
-    /**
-     * 发送即时消息到指定主题，无标签，消息内容使用 Object
-     * @param subject 消息主题
-     * @param object 消息对象
-     */
-    public void send(String subject, Object object) {
-        send(subject, null, object);
-    }
-
-    /**
-     * 发送即时消息到指定主题，消息内容使用 Object
-     * @param subject 消息主题
-     * @param tag 消息标签
-     * @param object 消息对象
-     */
-    public void send(String subject, String tag, Object object) {
-        send(subject, tag, QmqUtil.beanToMap(object));
-    }
-
-    /**
-     * 发送即时消息到指定主题，消息内容使用 Map
-     * @param subject 消息主题
-     * @param tag 消息标签
-     * @param content 消息内容
-     */
-    public void send(String subject, String tag, Map<String, Object> content) {
-        sendMessage(subject, tag, content, null);
+        send(QmqUtil.beanToMap(object));
     }
 
     /**
      * 异步发送消息，支持回调方法，消息内容使用 Map
-     * <ul>
-     *     <li>QMQ 暂时不支持同步发送消息，如果需要同步发送，要通过修改源代码实现</li>
-     * </ul>
-     * @param subject 消息主题
-     * @param tag 消息标签
      * @param content 消息内容
-     * @param date 消息发送日期，用于延迟或定时发送
      */
-    private void sendMessage(String subject, String tag, Map<String, Object> content, Date date) {
-        // 参数校验
-        Assert.hasText(subject, "QMQ 消息发送主题 Subject 不能为空");
-        Assert.notEmpty(content, "QMQ 消息发送内容 Content 不能为空");
-
-        // 转换消息对象
-        BaseMessage message = convertMessage(subject, content);
-        // 装载延迟消息时间
-        if (date != null && date.getTime() > System.currentTimeMillis()) {
-            message.setDelayTime(date);
+    public void send(Map<String, Object> content) {
+        if (CollectionUtils.isEmpty(content)) {
+            throw new QmqException("QMQ 消息发送内容不能为空");
         }
-        // 装载消息 Tag 标签
+
+        // 装载消息对象
+        BaseMessage message = (BaseMessage) producer.generateMessage(subject);
+        // 装载消息标签
         if (StringUtils.hasText(tag)) {
             message.addTag(tag);
         }
+        // 装载消息接收时间
+        if (receiveTime != null) {
+            message.setDelayTime(receiveTime);
+        }
+        // 遍历装载消息内容，过滤键值对为空的属性
+        content.entrySet().stream().filter(e -> StringUtils.hasText(e.getKey()) && !ObjectUtils.isEmpty(e.getValue()))
+                .forEach(entry -> bindMessage(message, entry));
 
         if (log.isTraceEnabled()) {
             log.trace("QMQ 异步消息准备发送，消息主题：{}，消息内容：{}", message.getSubject(), message.getAttrs());
         }
         // 发送消息，并返回回调结果
         producer.sendMessage(message, listener);
-    }
-
-    /**
-     * 组装消息对象
-     * @param subject 消息主题
-     * @param content 消息内容
-     * @return {@link BaseMessage} 消息实体
-     */
-    private BaseMessage convertMessage(String subject, Map<String, Object> content) {
-        // init message
-        BaseMessage message = (BaseMessage) producer.generateMessage(subject);
-        Assert.notNull(message, "QMQ 消息发送对象 BaseMessage 不能为空");
-
-        // 遍历装载消息内容
-        content.entrySet().forEach(entry -> bindMessage(message, entry));
-
-        return message;
     }
 
     /**
@@ -269,13 +215,6 @@ public class QmqTemplate {
      * @param entry 单条消息键值对
      */
     private void bindMessage(BaseMessage message, Map.Entry<String, Object> entry) {
-        // 键值对校验
-        if (StringUtils.isEmpty(entry.getKey()) || entry.getValue() == null) {
-            if (log.isTraceEnabled()) {
-                log.trace("QMQ 消息内容的键值对为空，key：{}，value：{}", entry.getKey(), entry.getValue());
-            }
-            return;
-        }
         // 声明消息内容的键值对
         String key = entry.getKey();
         Object value = entry.getValue();

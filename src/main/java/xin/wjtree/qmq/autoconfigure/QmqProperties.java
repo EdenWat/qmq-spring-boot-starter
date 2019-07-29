@@ -1,6 +1,5 @@
 package xin.wjtree.qmq.autoconfigure;
 
-import xin.wjtree.qmq.QmqTemplate;
 import xin.wjtree.qmq.constant.QmqHelper;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
@@ -40,7 +39,7 @@ public class QmqProperties {
 
     /**
      * QMQ 消息发送模板配置
-     * @see QmqTemplate
+     * @see xin.wjtree.qmq.QmqTemplate
      */
     private final Template template = new Template();
 
@@ -182,7 +181,7 @@ public class QmqProperties {
 
     /**
      * QMQ 消息发送模板配置
-     * @see QmqTemplate
+     * @see xin.wjtree.qmq.QmqTemplate
      */
     public static class Template {
         /**
