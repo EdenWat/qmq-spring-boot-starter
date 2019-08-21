@@ -118,6 +118,8 @@ public class JunitTest {
 
         // 使用链式调用方式
         template
+                // 消息主题，如果不填，会使用默认的消息主题
+                .subject("sub1")
                 // 消息发送状态监听器，此处只是为了 junit 测试使用，如果没有自定义需求，可以不设置
                 .listener(new MessageSendStateListener() {
                     @Override
@@ -130,8 +132,6 @@ public class JunitTest {
                         latch.countDown();
                     }
                 })
-                // 消息主题，如果不填，会使用默认的消息主题
-                .subject("sub1")
                 // 延时 10 秒接收消息
                 .delay(QmqTimeUnit.TEN_SECONDS)
                 // 定时 2019-07-30 00:46:00 接收消息
