@@ -40,7 +40,7 @@
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <java.version>1.8</java.version>
         <!-- dependency versions -->
-        <spring-boot.version>2.5.3</spring-boot.version>
+        <spring-boot.version>2.6.5</spring-boot.version>
         <qmq.version>1.1.33</qmq.version>
         <!-- maven pluging versions -->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
